@@ -15,6 +15,7 @@ final class ImagesListService {
     private var task: URLSessionTask?
     private(set) var photos: [Photo] = [] // downloaded photos
     private var lastLoadedPage: Int?
+    private let tokenStorage = OAuth2TokenStorage.shared
     
     static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
     
@@ -23,7 +24,7 @@ final class ImagesListService {
     
     // MARK: - Public methods
     // Скачивать больше одной страницы за раз не будем; если идёт закачка — будем отправлять новый запрос только после её завершения.
-    func fetchPhotosNextPage(_ token: String, page: Int, completion: @escaping (Result<[Photo], Error>) -> Void) {
+    func fetchPhotosNextPage() {
         
         assert(Thread.isMainThread)
         
@@ -43,10 +44,15 @@ final class ImagesListService {
         let nextPage = (lastLoadedPage ?? 0) + 1
         
         guard
+            let token = tokenStorage.token
+        else {
+            return
+        }
+        
+        guard
             let request = Endpoint.getImages(token: token, page: nextPage).request
         else {
-            completion(.failure(NetworkError.invalidRequest))
-            fatalError("cannot create URL")
+            return
         }
         
         print("LIST IMAGES REQUEST: \(request)")
@@ -63,14 +69,12 @@ final class ImagesListService {
                     self.lastLoadedPage = nextPage
                     NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: nil)
                 }
-                completion(.success(self.photos))
             case .failure(let error):
                 print("DEBUG",
                       "[\(String(describing: self)).\(#function)]:",
                       "Error while fetching images:",
                       error.localizedDescription,
                       separator: "\n")
-                completion(.failure(error))
             }
             DispatchQueue.main.async {
                 self.task = nil
