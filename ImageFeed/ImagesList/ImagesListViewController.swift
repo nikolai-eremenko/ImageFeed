@@ -89,6 +89,15 @@ extension ImagesListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
     }
+    
+    // вызывается прямо перед тем, как ячейка таблицы будет показана на экране.
+    // В этом методе можно проверить условие indexPath.row + 1 == photos.count,
+    // и если оно верно — вызывать fetchPhotosNextPage().
+    // Отметим, что этот метод может вызываться для одной и той же ячейки множество раз (иногда десятки раз).
+    // Поэтому нужно сделать так, чтобы многократные вызовы fetchPhotosNextPage() были «дешёвыми» по ресурсам и не приводили к прерыванию текущего сетевого запроса.
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        //
+    }
 }
 
 // MARK: - UITableViewDelegate
