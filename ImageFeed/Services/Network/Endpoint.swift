@@ -13,7 +13,7 @@ enum Endpoint {
     case sendCode(url: String = "/oauth/token", code: String)
     case getProfile(url: String = "/me", token: String)
     case getProfileImage(url: String = "/users", token: String, username: String)
-    case getImages(url: String = "/photos", token: String, page: Int)
+    case getImages(url: String = "/photos", token: String, page: Int, perPage: Int)
     
     var request: URLRequest? {
         guard let url = self.url else {
@@ -56,7 +56,7 @@ enum Endpoint {
             return url
         case .getProfileImage(let url, _, let username):
             return url + "/" + username
-        case .getImages(let url, _, _):
+        case .getImages(let url, _, _, _):
             return url
         }
     }
@@ -80,15 +80,10 @@ enum Endpoint {
             ]
             case .getProfile, .getProfileImage:
             return []
-        case .getImages(_, let token, let page):
+        case .getImages(_, _, let page, let perPage):
             return [
-                URLQueryItem(name: "client_id", value: Constants.API.accessKey),
                 URLQueryItem(name: "page", value: String(page)),
-                URLQueryItem(name: "per_page", value: "10"),
-                URLQueryItem(name: "order_by", value: "latest"),
-//                URLQueryItem(name: "query", value: "nature"),
-//                URLQueryItem(name: "orientation", value: "portrait"),
-                URLQueryItem(name: "X-ACCESS-TOKEN", value: token)
+                URLQueryItem(name: "per_page", value: String(perPage))
             ]
         }
     }
@@ -132,7 +127,7 @@ private extension URLRequest {
                 HTTP.Headers.Value.applicationJson.rawValue,
                 forHTTPHeaderField: HTTP.Headers.Key.contentType.rawValue
             )
-        case .getProfile(_, let token), .getProfileImage(_, let token, _), .getImages(_, let token, _):
+        case .getProfile(_, let token), .getProfileImage(_, let token, _), .getImages(_, let token, _, _):
             self.setValue(
                 HTTP.Headers.Value.bearer.rawValue + token,
                 forHTTPHeaderField: HTTP.Headers.Key.authorization.rawValue

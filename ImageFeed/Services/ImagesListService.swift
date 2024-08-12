@@ -13,8 +13,13 @@ final class ImagesListService {
     
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
-    private(set) var photos: [Photo] = [] // downloaded photos
-    private var lastLoadedPage: Int?
+    private(set) var photos: [Photo] = [] {
+        didSet {
+            NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: nil)
+        }
+    }
+    private var lastLoadedPage: (number: Int, total: Int)?
+    private let perPage: Int = 10
     private let tokenStorage = OAuth2TokenStorage.shared
     
     static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
@@ -24,7 +29,7 @@ final class ImagesListService {
     
     // MARK: - Public methods
     // Скачивать больше одной страницы за раз не будем; если идёт закачка — будем отправлять новый запрос только после её завершения.
-    func fetchPhotosNextPage() {
+    func fetchPhotosNextPage(_ token: String, completion: @escaping (Result<[Photo], Error>) -> Void) {
         
         assert(Thread.isMainThread)
         
@@ -41,16 +46,10 @@ final class ImagesListService {
         // и следующую страницу (на единицу больше), если есть предыдущая загруженная страница
         
         // функция внутри себя определяет номер следующей страницы для закачки (номер не должен сообщаться извне, как параметр функции);
-        let nextPage = (lastLoadedPage ?? 0) + 1
+        let nextPage = (lastLoadedPage?.number ?? 0) + 1
         
         guard
-            let token = tokenStorage.token
-        else {
-            return
-        }
-        
-        guard
-            let request = Endpoint.getImages(token: token, page: nextPage).request
+            let request = Endpoint.getImages(token: token, page: nextPage, perPage: perPage).request
         else {
             return
         }
@@ -63,10 +62,9 @@ final class ImagesListService {
             switch result {
             case .success(let object):
                 DispatchQueue.main.async {
-                    for photo in object {
-                        self.photos.append(Photo(from: photo))
-                    }
-                    self.lastLoadedPage = nextPage
+                    let photoResults = object.map { Photo(from: $0) }
+                    self.photos.append(contentsOf: photoResults)
+                    self.lastLoadedPage?.number = nextPage
                     NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: nil)
                 }
             case .failure(let error):
