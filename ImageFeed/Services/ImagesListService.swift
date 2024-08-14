@@ -128,4 +128,8 @@ final class ImagesListService {
         changeLikeTask = task
         task.resume()
     }
+    
+    func cleanImagesList() {
+        photos.removeAll()
+    }
 }

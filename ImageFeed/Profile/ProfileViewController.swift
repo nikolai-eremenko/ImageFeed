@@ -14,6 +14,7 @@ final class ProfileViewController: UIViewController {
     private let profileService = ProfileService.shared
     private let storage = OAuth2TokenStorage.shared
     private let profileImageService = ProfileImageService.shared
+    private let profileLogoutService = ProfileLogoutService.shared
     private var profileImageServiceObserver: NSObjectProtocol?
     
     //MARK: - UI Components
@@ -168,8 +169,8 @@ private extension ProfileViewController {
     //MARK: - Actions
     @objc
     func logoutAction() {
-        storage.removeTokenKey()
         dismiss(animated: true)
+        profileLogoutService.logout()
         print("DEBUG",
               "[\(String(describing: self)).\(#function)]:",
               "Logout button pressed")
