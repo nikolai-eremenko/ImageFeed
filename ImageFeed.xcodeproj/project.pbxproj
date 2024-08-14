@@ -17,6 +17,7 @@
 		910DD48B2C0C3B9300D57949 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 910DD48A2C0C3B9300D57949 /* Base */; };
 		910DD4B32C0DAC2000D57949 /* ImagesListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 910DD4B22C0DAC2000D57949 /* ImagesListCell.swift */; };
 		910DD4B62C0EDC4900D57949 /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 910DD4B52C0EDC4900D57949 /* GradientView.swift */; };
+		911018BB2C6C8260004F9E6C /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018BA2C6C8260004F9E6C /* Array+Extensions.swift */; };
 		9117F00B2C1AB16F0004D035 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9117F00A2C1AB16F0004D035 /* ProfileViewController.swift */; };
 		9131B97F2C2D332B00C8F344 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9131B97E2C2D332B00C8F344 /* Constants.swift */; };
 		9131B9822C2E83BD00C8F344 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9131B9812C2E83BD00C8F344 /* AuthViewController.swift */; };
@@ -74,6 +75,7 @@
 		910DD4B22C0DAC2000D57949 /* ImagesListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListCell.swift; sourceTree = "<group>"; };
 		910DD4B52C0EDC4900D57949 /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 		910DD4D42C10418B00D57949 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		911018BA2C6C8260004F9E6C /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		9117F00A2C1AB16F0004D035 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		9131B97E2C2D332B00C8F344 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		9131B9812C2E83BD00C8F344 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
@@ -205,6 +207,7 @@
 				916D64742C45CCFE0093898E /* URL+Extensions.swift */,
 				91F9A87C2C4A2DF5003E2B3A /* UIBlockingProgressHUD.swift */,
 				919AE5AF2C65FEE900109333 /* DateFormatter+PhotoDate.swift */,
+				911018BA2C6C8260004F9E6C /* Array+Extensions.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -390,6 +393,7 @@
 				9131B9842C2E8D9900C8F344 /* WebViewViewController.swift in Sources */,
 				91DAF7752C5BA52100F88ECE /* TabBarController.swift in Sources */,
 				910086CD2C64C9D100E63834 /* ImageCellModel.swift in Sources */,
+				911018BB2C6C8260004F9E6C /* Array+Extensions.swift in Sources */,
 				917ACF3D2C4A352800434CE7 /* Profile.swift in Sources */,
 				91DAF76B2C5A8ED200F88ECE /* AlertModel.swift in Sources */,
 				91E7F05C2C3FA8B300D9515B /* OAuth2Service.swift in Sources */,

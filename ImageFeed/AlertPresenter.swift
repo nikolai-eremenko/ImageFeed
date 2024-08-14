@@ -34,11 +34,17 @@ struct AlertPresenter {
         alert.view.accessibilityIdentifier = identifier
         
         for button in buttons {
-            let action = UIAlertAction(title: button, style: .default) { _ in
-                completion()
+            if button == "Не надо" {
+                let action = UIAlertAction(title: button, style: .cancel, handler: nil)
+                action.accessibilityIdentifier = button
+                alert.addAction(action)
+            } else {
+                let action = UIAlertAction(title: button, style: .default) { _ in
+                    completion()
+                }
+                action.accessibilityIdentifier = button
+                alert.addAction(action)
             }
-            action.accessibilityIdentifier = button
-            alert.addAction(action)
         }
         
         DispatchQueue.main.async {

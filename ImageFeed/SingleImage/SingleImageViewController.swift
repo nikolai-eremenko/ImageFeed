@@ -6,12 +6,17 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class SingleImageViewController: UIViewController {
-    var image: UIImage? = UIImage(named: "0") {
+    
+    var fullImageURL: URL?
+    
+    var image: UIImage? {
         didSet {
             guard isViewLoaded, let image else { return }
             imageView.image = image
+            imageView.frame.size = image.size
             rescaleAndCenterImageInScrollView(image: image)
         }
     }
@@ -20,8 +25,8 @@ final class SingleImageViewController: UIViewController {
     private lazy var scrollView: UIScrollView = {
         let view = UIScrollView()
         view.delegate = self
-        view.minimumZoomScale = 0.6
-        view.maximumZoomScale = 3.25
+        view.minimumZoomScale = 0.1
+        view.maximumZoomScale = 1.25
 //        view.contentMode = .scaleToFill
         view.showsVerticalScrollIndicator = false
         view.showsHorizontalScrollIndicator = false
@@ -53,18 +58,53 @@ final class SingleImageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        guard let image else { return }
-        imageView.image = image
-        imageView.frame.size = image.size
-        
         setupUI()
         setupConstraints()
         
-        rescaleAndCenterImageInScrollView(image: image)
+        showFullImage()
     }
 }
 
 private extension SingleImageViewController {
+    
+    func showFullImage() {
+        guard let fullImageURL = fullImageURL else { return }
+        UIBlockingProgressHUD.show()
+        imageView.kf.setImage(with: fullImageURL) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            
+            guard let self = self else { return }
+            
+            switch result {
+            case .success(let imageResult):
+                DispatchQueue.main.async {
+                    self.rescaleAndCenterImageInScrollView(image: imageResult.image)
+                }
+            case .failure(let error):
+                print("DEBUG",
+                      "[\(String(describing: self)).\(#function)]:",
+                      "Error while fetching full image: \(error.localizedDescription)",
+                      separator: "\n")
+                self.showError(vc: self)
+            }
+        }
+    }
+    
+    // MARK: - Error Alert
+    func showError(vc: SingleImageViewController) {
+        let alertModel = AlertModel(
+            title: "Что-то пошло не так!",
+            message: "Попробовать ещё раз?",
+            buttons: ["Не надо", "Повторить"],
+            identifier: "SingleImageError",
+            completion: {
+                self.showFullImage()
+            }
+        )
+        AlertPresenter.showAlert(on: vc, model: alertModel)
+    }
+    
+    // MARK: - ScrollView
     func rescaleAndCenterImageInScrollView(image: UIImage) {
         let minZoomScale = scrollView.minimumZoomScale
         let maxZoomScale = scrollView.maximumZoomScale
@@ -83,6 +123,24 @@ private extension SingleImageViewController {
         scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
     }
     
+    
+    // MARK: - Actions
+    @objc
+    func didTapBackButton() {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc
+    func didTapShareButton() {
+        guard let image = imageView.image else { return }
+        let share = UIActivityViewController(
+            activityItems: [image],
+            applicationActivities: nil
+        )
+        present(share, animated: true, completion: nil)
+    }
+    
+    // MARK: - UI
     func setupUI() {
         view.backgroundColor = .ypBlack
         view.addSubview(scrollView)
@@ -138,22 +196,6 @@ private extension SingleImageViewController {
             shareButton.widthAnchor.constraint(equalToConstant: 50),
             shareButton.heightAnchor.constraint(equalToConstant: 50)
         ])
-    }
-    
-    // MARK: - Actions
-    @objc
-    func didTapBackButton() {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    @objc
-    func didTapShareButton(_ sender: UIButton) {
-        guard let image else { return }
-        let share = UIActivityViewController(
-            activityItems: [image],
-            applicationActivities: nil
-        )
-        present(share, animated: true, completion: nil)
     }
 }
 

@@ -13,7 +13,7 @@ final class ProfileViewController: UIViewController {
     //MARK: - Properties
     private let profileService = ProfileService.shared
     private let storage = OAuth2TokenStorage.shared
-    private let imageService = ProfileImageService.shared
+    private let profileImageService = ProfileImageService.shared
     private var profileImageServiceObserver: NSObjectProtocol?
     
     //MARK: - UI Components
@@ -119,7 +119,7 @@ private extension ProfileViewController {
     
     func updateAvatar() {
         guard
-            let profileImageURL = imageService.avatarURL,
+            let profileImageURL = profileImageService.avatarURL,
             let url = URL(string: profileImageURL)
         else {
 //            profilePhoto.image = UIImage(named: "ic.person.crop.circle.fill")

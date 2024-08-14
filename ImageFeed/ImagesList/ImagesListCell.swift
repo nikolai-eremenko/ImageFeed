@@ -6,18 +6,33 @@
 //
 
 import UIKit
+import Kingfisher
+
+protocol ImagesListCellDelegate: AnyObject {
+    func imageListCellDidTapLike(_ cell: ImagesListCell)
+}
 
 final class ImagesListCell: UITableViewCell {
     
+    weak var delegate: ImagesListCellDelegate?
+    
+    private lazy var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        formatter.locale = Locale(identifier: "ru_RU")
+        return formatter
+    }()
+    
     //MARK: - UI Components
-    private lazy var cardView: UIView = {
+    private lazy var cellView: UIView = {
         let view = UIView()
         view.layer.masksToBounds = true
         view.layer.cornerRadius = 16
         return view
     }()
     
-    private lazy var cardImageView: UIImageView = {
+    private lazy var cellImageView: UIImageView = {
         let view = UIImageView()
         view.image = UIImage(named: "0")
         view.contentMode = .scaleAspectFill
@@ -38,6 +53,7 @@ final class ImagesListCell: UITableViewCell {
         let view = UIButton(type: .custom)
         view.setImage(UIImage(named: "ic.like"), for: .normal)
         view.tintColor = .ypWhiteAlpha50
+        view.addTarget(self, action: #selector(likeButtonClicked), for: .touchUpInside)
         return view
     }()
     
@@ -60,52 +76,108 @@ final class ImagesListCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure(with model: ImageCellModel) {
-        cardImageView.image = model.cardImageView
-        dateLabel.text = model.dateLabel
-        likeButton.tintColor = model.likeButtonColor
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        cellImageView.kf.cancelDownloadTask()
+        cellImageView.image = nil
+        likeButton.tintColor = .ypWhiteAlpha50
+        dateLabel.text = nil
+    }
+    
+    func configure(with model: Photo, tableView: UITableView, indexPath: IndexPath) {
+        
+        let url = URL(string: model.thumbImageURL)
+        
+        cellImageView.kf.indicatorType = .activity
+        cellImageView.kf.setImage(with: url,
+                                  placeholder: UIImage(named: "ic.scribble.variable"),
+                                  options: [/*.transition(.fade(1))*/]) { result in
+            switch result {
+            case .success(let value):
+                // при обновлении фото в ячейке нужно перегрузить ячейку, чтобы обновилась её высота
+                tableView.reloadRows(at: [indexPath], with: .automatic)
+                
+                let cacheType: String
+                switch value.cacheType {
+                case .none:
+                    cacheType = "Network"
+                case .memory:
+                    cacheType = "Memory"
+                case .disk:
+                    cacheType = "Disk"
+                }
+                print("DEBUG",
+                      "[\(String(describing: self)).\(#function)]:",
+                      "Image - \(value.image)",
+                      "Loaded from - \(cacheType)",
+                      "Source - \(value.source)",
+                      separator: "\n")
+            case .failure(let error):
+                print("DEBUG",
+                      "[\(String(describing: self)).\(#function)]:",
+                      "Error loading image:",
+                      error.localizedDescription)
+                self.cellImageView.image = UIImage(named: "ic.scribble.variable")
+            }
+        }
+        
+        dateLabel.text = dateFormatter.string(from: model.createdAt ?? Date())
+        let isLiked = model.isLiked
+        likeButton.tintColor = isLiked ? .ypRed : .ypWhiteAlpha50
+    }
+    
+    func setIsLiked(_ isLiked: Bool) {
+        self.likeButton.tintColor = isLiked ? .ypRed : .ypWhiteAlpha50
     }
 }
 
 private extension ImagesListCell {
+    
     func setupUI() {
         contentView.backgroundColor = .ypBlack
-        contentView.addSubview(cardView)
-        cardView.addSubview(cardImageView)
-        cardView.addSubview(likeButton)
-        cardView.addSubview(gradientView)
-        cardView.addSubview(dateLabel)
-        cardView.translatesAutoresizingMaskIntoConstraints = false
-        cardView.subviews.forEach {
+        contentView.addSubview(cellView)
+        cellView.addSubview(cellImageView)
+        cellView.addSubview(likeButton)
+        cellView.addSubview(gradientView)
+        cellView.addSubview(dateLabel)
+        cellView.translatesAutoresizingMaskIntoConstraints = false
+        cellView.subviews.forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
     }
     
+    // MARK: - Actions
+    @objc
+    func likeButtonClicked() {
+        delegate?.imageListCellDidTapLike(self)
+    }
+    
+    // MARK: - Constraints
     func setupConstraints() {
         NSLayoutConstraint.activate([
-            cardView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 16),
-            cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            cardView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
-            cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
+            cellView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 16),
+            cellView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            cellView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
+            cellView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
             
-            cardImageView.leadingAnchor.constraint(equalTo: cardView.leadingAnchor),
-            cardImageView.trailingAnchor.constraint(equalTo: cardView.trailingAnchor),
-            cardImageView.topAnchor.constraint(equalTo: cardView.topAnchor),
-            cardImageView.bottomAnchor.constraint(equalTo: cardView.bottomAnchor),
+            cellImageView.leadingAnchor.constraint(equalTo: cellView.leadingAnchor),
+            cellImageView.trailingAnchor.constraint(equalTo: cellView.trailingAnchor),
+            cellImageView.topAnchor.constraint(equalTo: cellView.topAnchor),
+            cellImageView.bottomAnchor.constraint(equalTo: cellView.bottomAnchor),
             
-            gradientView.leadingAnchor.constraint(equalTo: cardView.leadingAnchor),
-            gradientView.trailingAnchor.constraint(equalTo: cardView.trailingAnchor),
-            gradientView.bottomAnchor.constraint(equalTo: cardView.bottomAnchor),
+            gradientView.leadingAnchor.constraint(equalTo: cellView.leadingAnchor),
+            gradientView.trailingAnchor.constraint(equalTo: cellView.trailingAnchor),
+            gradientView.bottomAnchor.constraint(equalTo: cellView.bottomAnchor),
             gradientView.heightAnchor.constraint(equalToConstant: 30),
             
-            likeButton.trailingAnchor.constraint(equalTo: cardView.trailingAnchor),
-            likeButton.topAnchor.constraint(equalTo: cardView.topAnchor),
+            likeButton.trailingAnchor.constraint(equalTo: cellView.trailingAnchor),
+            likeButton.topAnchor.constraint(equalTo: cellView.topAnchor),
             likeButton.widthAnchor.constraint(equalToConstant: 44),
             likeButton.heightAnchor.constraint(equalToConstant: 44),
             
-            dateLabel.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 8),
-            dateLabel.trailingAnchor.constraint(lessThanOrEqualTo: cardView.trailingAnchor, constant: -8),
-            dateLabel.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -8)
+            dateLabel.leadingAnchor.constraint(equalTo: cellView.leadingAnchor, constant: 8),
+            dateLabel.trailingAnchor.constraint(lessThanOrEqualTo: cellView.trailingAnchor, constant: -8),
+            dateLabel.bottomAnchor.constraint(equalTo: cellView.bottomAnchor, constant: -8)
         ])
     }
 }

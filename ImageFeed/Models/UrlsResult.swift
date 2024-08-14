@@ -10,4 +10,5 @@ import Foundation
 struct UrlsResult: Codable {
     let regular: String
     let thumb: String
+    let full: String
 }
