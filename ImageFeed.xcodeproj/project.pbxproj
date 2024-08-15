@@ -19,6 +19,7 @@
 		910DD4B62C0EDC4900D57949 /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 910DD4B52C0EDC4900D57949 /* GradientView.swift */; };
 		911018BB2C6C8260004F9E6C /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018BA2C6C8260004F9E6C /* Array+Extensions.swift */; };
 		911018BD2C6CB084004F9E6C /* ProfileLogoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018BC2C6CB084004F9E6C /* ProfileLogoutService.swift */; };
+		911018BF2C6DEB49004F9E6C /* Date+StringDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018BE2C6DEB49004F9E6C /* Date+StringDate.swift */; };
 		9117F00B2C1AB16F0004D035 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9117F00A2C1AB16F0004D035 /* ProfileViewController.swift */; };
 		9131B97F2C2D332B00C8F344 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9131B97E2C2D332B00C8F344 /* Constants.swift */; };
 		9131B9822C2E83BD00C8F344 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9131B9812C2E83BD00C8F344 /* AuthViewController.swift */; };
@@ -35,7 +36,6 @@
 		919AE5AA2C65DE8E00109333 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919AE5A92C65DE8E00109333 /* Photo.swift */; };
 		919AE5AC2C65E40C00109333 /* PhotoResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919AE5AB2C65E40C00109333 /* PhotoResult.swift */; };
 		919AE5AE2C65E45400109333 /* UrlsResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919AE5AD2C65E45400109333 /* UrlsResult.swift */; };
-		919AE5B02C65FEE900109333 /* DateFormatter+PhotoDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919AE5AF2C65FEE900109333 /* DateFormatter+PhotoDate.swift */; };
 		91DAF7662C5A581500F88ECE /* URLSession+object.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DAF7652C5A581500F88ECE /* URLSession+object.swift */; };
 		91DAF7692C5A8DCE00F88ECE /* AlertPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DAF7682C5A8DCE00F88ECE /* AlertPresenter.swift */; };
 		91DAF76B2C5A8ED200F88ECE /* AlertModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DAF76A2C5A8ED200F88ECE /* AlertModel.swift */; };
@@ -78,6 +78,7 @@
 		910DD4D42C10418B00D57949 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		911018BA2C6C8260004F9E6C /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		911018BC2C6CB084004F9E6C /* ProfileLogoutService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileLogoutService.swift; sourceTree = "<group>"; };
+		911018BE2C6DEB49004F9E6C /* Date+StringDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+StringDate.swift"; sourceTree = "<group>"; };
 		9117F00A2C1AB16F0004D035 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		9131B97E2C2D332B00C8F344 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		9131B9812C2E83BD00C8F344 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
@@ -93,7 +94,6 @@
 		919AE5A92C65DE8E00109333 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		919AE5AB2C65E40C00109333 /* PhotoResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoResult.swift; sourceTree = "<group>"; };
 		919AE5AD2C65E45400109333 /* UrlsResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlsResult.swift; sourceTree = "<group>"; };
-		919AE5AF2C65FEE900109333 /* DateFormatter+PhotoDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+PhotoDate.swift"; sourceTree = "<group>"; };
 		91DAF7652C5A581500F88ECE /* URLSession+object.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLSession+object.swift"; sourceTree = "<group>"; };
 		91DAF7682C5A8DCE00F88ECE /* AlertPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertPresenter.swift; sourceTree = "<group>"; };
 		91DAF76A2C5A8ED200F88ECE /* AlertModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertModel.swift; sourceTree = "<group>"; };
@@ -208,7 +208,7 @@
 				915749F12C1C750D00E46541 /* UITableViewCell+Identifire.swift */,
 				916D64742C45CCFE0093898E /* URL+Extensions.swift */,
 				91F9A87C2C4A2DF5003E2B3A /* UIBlockingProgressHUD.swift */,
-				919AE5AF2C65FEE900109333 /* DateFormatter+PhotoDate.swift */,
+				911018BE2C6DEB49004F9E6C /* Date+StringDate.swift */,
 				911018BA2C6C8260004F9E6C /* Array+Extensions.swift */,
 			);
 			path = Helpers;
@@ -397,6 +397,7 @@
 				91DAF7752C5BA52100F88ECE /* TabBarController.swift in Sources */,
 				910086CD2C64C9D100E63834 /* ImageCellModel.swift in Sources */,
 				911018BB2C6C8260004F9E6C /* Array+Extensions.swift in Sources */,
+				911018BF2C6DEB49004F9E6C /* Date+StringDate.swift in Sources */,
 				917ACF3D2C4A352800434CE7 /* Profile.swift in Sources */,
 				91DAF76B2C5A8ED200F88ECE /* AlertModel.swift in Sources */,
 				91E7F05C2C3FA8B300D9515B /* OAuth2Service.swift in Sources */,
@@ -406,7 +407,6 @@
 				910DD4832C0C3B9200D57949 /* ImagesListViewController.swift in Sources */,
 				919AE5AC2C65E40C00109333 /* PhotoResult.swift in Sources */,
 				9131B9822C2E83BD00C8F344 /* AuthViewController.swift in Sources */,
-				919AE5B02C65FEE900109333 /* DateFormatter+PhotoDate.swift in Sources */,
 				91DAF7662C5A581500F88ECE /* URLSession+object.swift in Sources */,
 				910AF9D82C5767BE00AC2520 /* ProfileImageService.swift in Sources */,
 				910DD4B32C0DAC2000D57949 /* ImagesListCell.swift in Sources */,

@@ -34,7 +34,7 @@ struct AlertPresenter {
         alert.view.accessibilityIdentifier = identifier
         
         for button in buttons {
-            if button == "Не надо" {
+            if button == "Не надо" || button == "Нет" {
                 let action = UIAlertAction(title: button, style: .cancel, handler: nil)
                 action.accessibilityIdentifier = button
                 alert.addAction(action)

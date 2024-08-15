@@ -27,7 +27,6 @@ final class SingleImageViewController: UIViewController {
         view.delegate = self
         view.minimumZoomScale = 0.1
         view.maximumZoomScale = 1.25
-//        view.contentMode = .scaleToFill
         view.showsVerticalScrollIndicator = false
         view.showsHorizontalScrollIndicator = false
         return view

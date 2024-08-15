@@ -13,8 +13,9 @@ struct Photo {
     let createdAt: Date?
     let welcomeDescription: String?
     let fullImageURL: String
-    let thumbImageURL: String
     let largeImageURL: String
+    let smallImageURL: String
+    let thumbImageURL: String
     let isLiked: Bool
     
     init(photoResult: PhotoResult) {
@@ -23,8 +24,9 @@ struct Photo {
         self.createdAt = photoResult.createdAt
         self.welcomeDescription = photoResult.description
         self.fullImageURL = photoResult.urls.full
-        self.thumbImageURL = photoResult.urls.thumb
         self.largeImageURL = photoResult.urls.regular
+        self.smallImageURL = photoResult.urls.small
+        self.thumbImageURL = photoResult.urls.thumb
         self.isLiked = photoResult.likedByUser
     }
     
@@ -34,8 +36,9 @@ struct Photo {
         self.createdAt = photo.createdAt
         self.welcomeDescription = photo.welcomeDescription
         self.fullImageURL = photo.fullImageURL
-        self.thumbImageURL = photo.thumbImageURL
         self.largeImageURL = photo.largeImageURL
+        self.smallImageURL = photo.smallImageURL
+        self.thumbImageURL = photo.thumbImageURL
         self.isLiked = isLiked
     }
 }

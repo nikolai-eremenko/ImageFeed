@@ -15,13 +15,6 @@ final class ImagesListViewController: UIViewController {
     private let imagesListService = ImagesListService()
     private var imageListServiceObserver: NSObjectProtocol?
     
-    private lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .none
-        return formatter
-    }()
-    
     //MARK: - UI Components
     private lazy var tableView: UITableView = {
         let view = UITableView()
@@ -41,10 +34,10 @@ final class ImagesListViewController: UIViewController {
         
         setupUI()
         setupConstraints()
-        
         addImageListServiceObserver()
-        
-        imagesListService.fetchPhotosNextPage()
+        if photos.count == 0 {
+            imagesListService.fetchPhotosNextPage()
+        }
     }
 }
 
@@ -55,8 +48,22 @@ private extension ImagesListViewController {
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
     }
-      
-    @objc
+    
+    // MARK: - Notifications
+    func addImageListServiceObserver() {
+        imageListServiceObserver = NotificationCenter.default.addObserver(
+            forName: ImagesListService.didChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+
+            self.updateTableViewAnimated()
+        }
+    }
+    
+    
+    // MARK: - Insert rows
     func updateTableViewAnimated() {
         DispatchQueue.main.async {
             let oldCount = self.photos.count
@@ -73,16 +80,71 @@ private extension ImagesListViewController {
         }
     }
     
-    func addImageListServiceObserver() {
-        imageListServiceObserver = NotificationCenter.default.addObserver(
-            forName: ImagesListService.didChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            guard let self = self else { return }
-
-            self.updateTableViewAnimated()
+    // MARK: - Cell
+    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
+        let stringDate: String
+        if let date = photos[indexPath.row].createdAt {
+            stringDate = date.stringDate
+        } else {
+            stringDate = ""
         }
+
+        guard let url = URL(string: photos[indexPath.row].smallImageURL) else {return}
+        
+        cell.cellImageView.kf.indicatorType = .activity
+        cell.cellImageView.kf.setImage(with: url,
+                              placeholder: UIImage(named: "ic.scribble.variable"),
+                              options: [.transition(.fade(1))]) { [weak self] result in
+            guard let self = self else {return}
+            switch result {
+            case .success(let value):
+                cell.configure(image: value.image, date: stringDate, isLiked: photos[indexPath.row].isLiked)
+                // при обновлении фото в ячейке нужно перегрузить ячейку, чтобы обновилась её высота
+                // некоторые ячейки не отрисовываются при быстрой прокрутке вверх
+                // self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                
+                let cacheType: String
+                switch value.cacheType {
+                case .none:
+                    cacheType = "Network"
+                case .memory:
+                    cacheType = "Memory"
+                case .disk:
+                    cacheType = "Disk"
+                }
+                
+                print("DEBUG",
+//                      "[\(String(describing: self)).\(#function)]:",
+//                      "Image - \(value.image)",
+                      "Image loaded from - \(cacheType)",
+                      "Source - \(value.source)",
+                      separator: "\n")
+                
+            case .failure(let error):
+                print("DEBUG",
+                      "[\(String(describing: self)).\(#function)]:",
+                      "Error loading image:",
+                      error.localizedDescription)
+                guard let placeholder = UIImage(named: "ic.scribble.variable") else {return}
+                cell.configure(image: placeholder, date: stringDate, isLiked: photos[indexPath.row].isLiked)
+            }
+        }
+
+        let selectedView = UIView()
+        selectedView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.2)
+        cell.selectedBackgroundView = selectedView
+    }
+    
+    // MARK: - Alerts
+    func showLikeErrorAlert(vc: ImagesListViewController) {
+        let alertModel = AlertModel(
+            title: "Ошибка!",
+            message: "Не удалось поставить лайк",
+            buttons: ["OK"],
+            identifier: "LikeError",
+            completion: {}
+        )
+        AlertPresenter.showAlert(on: vc, model: alertModel)
     }
     
     // MARK: - Constraints
@@ -104,11 +166,9 @@ extension ImagesListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath) as? ImagesListCell {
-            
-            let photo = photos[indexPath.row]
             cell.delegate = self
             cell.selectionStyle = .none
-            cell.configure(with: photo, tableView: tableView, indexPath: indexPath)
+            configCell(for: cell, with: indexPath)
             return cell
         } else {
             return UITableViewCell()
@@ -148,15 +208,13 @@ extension ImagesListViewController: UITableViewDelegate {
 extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let photo = photos[indexPath.row]
         
+        let photo = photos[indexPath.row]
         UIBlockingProgressHUD.show()
         
         imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { result in
-            
             switch result {
             case .success:
-                // Синхронизируем массив картинок с сервисом
                 DispatchQueue.main.async {
                     self.photos = self.imagesListService.photos
                     cell.setIsLiked(self.photos[indexPath.row].isLiked)
@@ -164,8 +222,11 @@ extension ImagesListViewController: ImagesListCellDelegate {
                 UIBlockingProgressHUD.dismiss()
             case .failure(let error):
                 UIBlockingProgressHUD.dismiss()
-                // TODO: Показать ошибку с использованием UIAlertController
-                print(error)
+                print("DEBUG",
+                      "[\(String(describing: self)).\(#function)]:",
+                      error.localizedDescription,
+                      separator: "\n")
+                self.showLikeErrorAlert(vc: self)
             }
         }
     }

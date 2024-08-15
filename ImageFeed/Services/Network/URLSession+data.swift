@@ -33,14 +33,14 @@ extension URLSession {
         }
         
         let task = dataTask(with: request, completionHandler: { data, response, error in
-            if let data = data, let response = response, let statusCode = (response as? HTTPURLResponse)?.statusCode, let headers = (response as? HTTPURLResponse)?.allHeaderFields {
+            if let data = data, let response = response, let statusCode = (response as? HTTPURLResponse)?.statusCode/*, let headers = (response as? HTTPURLResponse)?.allHeaderFields*/ {
                 switch statusCode {
                 case 200...299:
-                    print("DEBUG",
-                          "[\(String(describing: self)).\(#function)]:",
-                          "- code: \(statusCode)",
-                          "- headers: \(headers)",
-                          separator: "\n")
+//                    print("DEBUG",
+//                          "[\(String(describing: self)).\(#function)]:",
+//                          "- code: \(statusCode)",
+////                          "- headers: \(headers)",
+//                          separator: "\n")
                     fulfillCompletionOnTheMainThread(.success(data))
                 case 400:
                     print("DEBUG",

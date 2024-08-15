@@ -13,12 +13,8 @@ final class ImagesListService {
     private let urlSession = URLSession.shared
     private var fetchPhotosTask: URLSessionTask?
     private var changeLikeTask: URLSessionTask?
-    private(set) var photos: [Photo] = [] {
-        didSet {
-            NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: nil)
-        }
-    }
-    private var lastLoadedPage: (number: Int, total: Int)?
+    private(set) var photos: [Photo] = []
+    private var lastLoadedPage: Int = 0
     private let perPage: Int = 10
     private let tokenStorage = OAuth2TokenStorage.shared
     
@@ -27,20 +23,13 @@ final class ImagesListService {
     
     // MARK: - Fetch photos
     func fetchPhotosNextPage() {
-        
         assert(Thread.isMainThread)
         
         guard let token = tokenStorage.token else { return }
         
-        guard fetchPhotosTask == nil else {
-            print("DEBUG",
-                  "[\(String(describing: self)).\(#function)]:",
-                  "Task is already in progress!",
-                  separator: "\n")
-            return
-        }
+        guard fetchPhotosTask == nil else { return }
         
-        let nextPage = (lastLoadedPage?.number ?? 0) + 1
+        let nextPage = lastLoadedPage + 1
         
         guard
             let request = Endpoint.getImages(token: token, page: nextPage, perPage: perPage).request
@@ -55,12 +44,13 @@ final class ImagesListService {
             
             switch result {
             case .success(let object):
+                let photos = object.map { Photo(photoResult: $0) }
+                
                 DispatchQueue.main.async {
-                    let photos = object.map { Photo(photoResult: $0) }
                     self.photos.append(contentsOf: photos)
-                    self.lastLoadedPage?.number = nextPage
-                    // get total from headers
-//                    self.lastLoadedPage?.total = object.count
+                    self.lastLoadedPage = nextPage
+                    NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
+                    self.fetchPhotosTask = nil
                 }
             case .failure(let error):
                 print("DEBUG",
@@ -68,9 +58,9 @@ final class ImagesListService {
                       "Error while fetching images:",
                       error.localizedDescription,
                       separator: "\n")
-            }
-            DispatchQueue.main.async {
-                self.fetchPhotosTask = nil
+                DispatchQueue.main.async {
+                    self.fetchPhotosTask = nil
+                }
             }
         }
         self.fetchPhotosTask = task
@@ -98,8 +88,6 @@ final class ImagesListService {
             return
         }
         
-        print("CHANGE LIKE REQUEST: \(request)")
-        
         let task = urlSession.dataTask(with: request) { [weak self] (data, response, error) in
             
             guard let self = self else { return }
@@ -107,16 +95,17 @@ final class ImagesListService {
             if let error = error {
                 self.changeLikeTask = nil
                 completion(.failure(error))
+                print("DEBUG",
+                      "[\(String(describing: self)).\(#function)]:",
+                      "Error while changing like:",
+                      error.localizedDescription,
+                      separator: "\n")
                 return
             }
             
-            // Поиск индекса элемента
             if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
-                // Текущий элемент
-               let photo = self.photos[index]
-               // Копия элемента с инвертированным значением isLiked.
+                let photo = self.photos[index]
                 let newPhoto = Photo(photo: photo, isLiked: !photo.isLiked)
-                // Заменяем элемент в массиве.
                 DispatchQueue.main.async {
                     self.photos = self.photos.withReplaced(itemAt: index, newValue: newPhoto)
                 }

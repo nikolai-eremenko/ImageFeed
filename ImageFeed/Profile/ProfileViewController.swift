@@ -123,7 +123,7 @@ private extension ProfileViewController {
             let profileImageURL = profileImageService.avatarURL,
             let url = URL(string: profileImageURL)
         else {
-//            profilePhoto.image = UIImage(named: "ic.person.crop.circle.fill")
+            profilePhoto.image = UIImage(named: "ic.person.crop.circle.fill")
             return
         }
         
@@ -166,14 +166,25 @@ private extension ProfileViewController {
         }
     }
     
+    // MARK: - Logout Alert
+    func showLogoutAlert(vc: ProfileViewController) {
+        let alertModel = AlertModel(
+            title: "Пока, пока!",
+            message: "Уверенные что хотите выйти?",
+            buttons: ["Да", "Нет"],
+            identifier: "Logout",
+            completion: {
+                self.profileLogoutService.logout()
+            }
+        )
+        AlertPresenter.showAlert(on: vc, model: alertModel)
+    }
+    
     //MARK: - Actions
     @objc
     func logoutAction() {
         dismiss(animated: true)
-        profileLogoutService.logout()
-        print("DEBUG",
-              "[\(String(describing: self)).\(#function)]:",
-              "Logout button pressed")
+        showLogoutAlert(vc: self)
     }
     
     // MARK: - Constraints

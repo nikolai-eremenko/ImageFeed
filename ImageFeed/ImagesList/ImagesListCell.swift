@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Kingfisher
 
 protocol ImagesListCellDelegate: AnyObject {
     func imageListCellDidTapLike(_ cell: ImagesListCell)
@@ -15,15 +14,7 @@ protocol ImagesListCellDelegate: AnyObject {
 final class ImagesListCell: UITableViewCell {
     
     weak var delegate: ImagesListCellDelegate?
-    
-    private lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .none
-        formatter.locale = Locale(identifier: "ru_RU")
-        return formatter
-    }()
-    
+        
     //MARK: - UI Components
     private lazy var cellView: UIView = {
         let view = UIView()
@@ -32,9 +23,9 @@ final class ImagesListCell: UITableViewCell {
         return view
     }()
     
-    private lazy var cellImageView: UIImageView = {
+    lazy var cellImageView: UIImageView = {
         let view = UIImageView()
-        view.image = UIImage(named: "0")
+//        view.image = UIImage(named: "0")
         view.contentMode = .scaleAspectFill
         view.backgroundColor = .clear
         
@@ -61,7 +52,7 @@ final class ImagesListCell: UITableViewCell {
         let view = UILabel()
         view.font = .systemFont(ofSize: 13, weight: .regular)
         view.textColor = .ypWhite
-        view.text = "27 августа 2022"
+//        view.text = "27 августа 2022"
         return view
     }()
     
@@ -84,45 +75,10 @@ final class ImagesListCell: UITableViewCell {
         dateLabel.text = nil
     }
     
-    func configure(with model: Photo, tableView: UITableView, indexPath: IndexPath) {
-        
-        let url = URL(string: model.thumbImageURL)
-        
-        cellImageView.kf.indicatorType = .activity
-        cellImageView.kf.setImage(with: url,
-                                  placeholder: UIImage(named: "ic.scribble.variable"),
-                                  options: [/*.transition(.fade(1))*/]) { result in
-            switch result {
-            case .success(let value):
-                // при обновлении фото в ячейке нужно перегрузить ячейку, чтобы обновилась её высота
-                tableView.reloadRows(at: [indexPath], with: .automatic)
-                
-                let cacheType: String
-                switch value.cacheType {
-                case .none:
-                    cacheType = "Network"
-                case .memory:
-                    cacheType = "Memory"
-                case .disk:
-                    cacheType = "Disk"
-                }
-                print("DEBUG",
-                      "[\(String(describing: self)).\(#function)]:",
-                      "Image - \(value.image)",
-                      "Loaded from - \(cacheType)",
-                      "Source - \(value.source)",
-                      separator: "\n")
-            case .failure(let error):
-                print("DEBUG",
-                      "[\(String(describing: self)).\(#function)]:",
-                      "Error loading image:",
-                      error.localizedDescription)
-                self.cellImageView.image = UIImage(named: "ic.scribble.variable")
-            }
-        }
-        
-        dateLabel.text = dateFormatter.string(from: model.createdAt ?? Date())
-        let isLiked = model.isLiked
+    // MARK: - Configuration
+    func configure(image: UIImage, date: String, isLiked: Bool) {
+        cellImageView.image = image
+        dateLabel.text = date
         likeButton.tintColor = isLiked ? .ypRed : .ypWhiteAlpha50
     }
     

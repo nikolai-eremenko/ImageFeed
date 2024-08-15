@@ -8,7 +8,8 @@
 import Foundation
 
 struct UrlsResult: Codable {
-    let regular: String
-    let thumb: String
     let full: String
+    let regular: String
+    let small: String
+    let thumb: String
 }
