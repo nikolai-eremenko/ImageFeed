@@ -65,7 +65,8 @@ private extension ImagesListViewController {
     
     // MARK: - Insert rows
     func updateTableViewAnimated() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             let oldCount = self.photos.count
             let newCount = self.imagesListService.photos.count
             if oldCount != newCount {
@@ -212,7 +213,8 @@ extension ImagesListViewController: ImagesListCellDelegate {
         let photo = photos[indexPath.row]
         UIBlockingProgressHUD.show()
         
-        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { result in
+        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
+            guard let self else { return }
             switch result {
             case .success:
                 DispatchQueue.main.async {
