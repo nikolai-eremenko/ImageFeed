@@ -171,7 +171,7 @@ private extension ProfileViewController {
         let alertModel = AlertModel(
             title: "Пока, пока!",
             message: "Уверенные что хотите выйти?",
-            buttons: ["Да", "Нет"],
+            buttons: [.yesButton, .noButton],
             identifier: "Logout",
             completion: {
                 self.profileLogoutService.logout()

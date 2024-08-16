@@ -21,7 +21,7 @@ struct AlertPresenter {
     private static func showBasicAlert(on vc: UIViewController,
                                        title: String,
                                        message: String,
-                                       buttons: [String],
+                                       buttons: [AlertButton],
                                        identifier: String,
                                        completion: @escaping () -> ()) {
         
@@ -34,15 +34,16 @@ struct AlertPresenter {
         alert.view.accessibilityIdentifier = identifier
         
         for button in buttons {
-            if button == "Не надо" || button == "Нет" {
-                let action = UIAlertAction(title: button, style: .cancel, handler: nil)
-                action.accessibilityIdentifier = button
+            switch button {
+            case .cancelButton, .noButton:
+                let action = UIAlertAction(title: button.title, style: .cancel, handler: nil)
+                action.accessibilityIdentifier = button.accessibilityIdentifier
                 alert.addAction(action)
-            } else {
-                let action = UIAlertAction(title: button, style: .default) { _ in
+            default:
+                let action = UIAlertAction(title: button.title, style: .default) { _ in
                     completion()
                 }
-                action.accessibilityIdentifier = button
+                action.accessibilityIdentifier = button.accessibilityIdentifier
                 alert.addAction(action)
             }
         }

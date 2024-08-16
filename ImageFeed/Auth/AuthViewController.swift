@@ -64,7 +64,7 @@ private extension AuthViewController {
         let alertModel = AlertModel(
             title: "Что-то пошло не так!",
             message: "Не удалось войти в систему.",
-            buttons: ["OK"],
+            buttons: [.okButton],
             identifier: "AuthError",
             completion: {
                 vc.dismiss(animated: true)

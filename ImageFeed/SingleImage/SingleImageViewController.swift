@@ -94,7 +94,7 @@ private extension SingleImageViewController {
         let alertModel = AlertModel(
             title: "Что-то пошло не так!",
             message: "Попробовать ещё раз?",
-            buttons: ["Не надо", "Повторить"],
+            buttons: [.cancelButton, .retryButton],
             identifier: "SingleImageError",
             completion: {
                 self.showFullImage()

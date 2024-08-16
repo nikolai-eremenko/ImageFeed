@@ -127,7 +127,7 @@ final class ImagesListViewController: UIViewController {
         let alertModel = AlertModel(
             title: "Ошибка!",
             message: "Не удалось поставить лайк",
-            buttons: ["OK"],
+            buttons: [.okButton],
             identifier: "LikeError",
             completion: {}
         )
