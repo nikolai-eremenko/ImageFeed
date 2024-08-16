@@ -14,6 +14,7 @@ final class ImagesListViewController: UIViewController {
 
     private let imagesListService = ImagesListService()
     private var imageListServiceObserver: NSObjectProtocol?
+    private let dateFormatter = DateConvertor.shared
     
     //MARK: - UI Components
     private lazy var tableView: UITableView = {
@@ -85,7 +86,7 @@ private extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         let stringDate: String
         if let date = photos[indexPath.row].createdAt {
-            stringDate = date.stringDate
+            stringDate = dateFormatter.getStringFromDate(from: date)
         } else {
             stringDate = ""
         }
