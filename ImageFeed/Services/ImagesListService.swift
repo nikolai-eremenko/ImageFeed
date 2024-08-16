@@ -9,11 +9,10 @@ import Foundation
 
 final class ImagesListService {
     // MARK: - properties
-    
     private let urlSession = URLSession.shared
     private var fetchPhotosTask: URLSessionTask?
     private var changeLikeTask: URLSessionTask?
-    private(set) var photos: [Photo] = []
+    private(set) var photos = [Photo]()
     private var lastLoadedPage: Int = 0
     private let perPage: Int = 10
     private let tokenStorage = OAuth2TokenStorage.shared
@@ -25,22 +24,24 @@ final class ImagesListService {
     func fetchPhotosNextPage() {
         assert(Thread.isMainThread)
         
-        guard let token = tokenStorage.token else { return }
-        
-        guard fetchPhotosTask == nil else { return }
+        guard
+            let token = tokenStorage.token,
+            fetchPhotosTask == nil
+        else {
+            return
+        }
         
         let nextPage = lastLoadedPage + 1
         
         guard
             let request = Endpoint.getImages(token: token, page: nextPage, perPage: perPage).request
         else {
+            print("cannot create URL")
             return
         }
         
-        print("LIST IMAGES REQUEST: \(request)")
-        
         let task = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
-            guard let self = self else { return }
+            guard let self else { return }
             
             switch result {
             case .success(let object):
@@ -90,7 +91,7 @@ final class ImagesListService {
         
         let task = urlSession.dataTask(with: request) { [weak self] (data, response, error) in
             
-            guard let self = self else { return }
+            guard let self else { return }
             
             if let error = error {
                 self.changeLikeTask = nil
