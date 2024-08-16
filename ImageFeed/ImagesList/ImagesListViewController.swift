@@ -9,12 +9,12 @@ import UIKit
 import Kingfisher
 
 final class ImagesListViewController: UIViewController {
+    
     //MARK: - Properties
-    private var photos: [Photo] = []
-
     private let imagesListService = ImagesListService()
-    private var imageListServiceObserver: NSObjectProtocol?
     private let dateFormatter = DateConvertor.shared
+    private var photos = [Photo]()
+    private var imageListServiceObserver: NSObjectProtocol?
     
     //MARK: - UI Components
     private lazy var tableView: UITableView = {
@@ -40,32 +40,22 @@ final class ImagesListViewController: UIViewController {
             imagesListService.fetchPhotosNextPage()
         }
     }
-}
-
-private extension ImagesListViewController {
-    // MARK: - UI
-    func setupUI() {
-        view.backgroundColor = .ypBlack
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-    }
     
     // MARK: - Notifications
-    func addImageListServiceObserver() {
+    private func addImageListServiceObserver() {
         imageListServiceObserver = NotificationCenter.default.addObserver(
             forName: ImagesListService.didChangeNotification,
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            guard let self = self else { return }
+            guard let self else { return }
 
             self.updateTableViewAnimated()
         }
     }
     
-    
     // MARK: - Insert rows
-    func updateTableViewAnimated() {
+    private func updateTableViewAnimated() {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             let oldCount = self.photos.count
@@ -83,7 +73,7 @@ private extension ImagesListViewController {
     }
     
     // MARK: - Cell
-    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
+    private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         let stringDate: String
         if let date = photos[indexPath.row].createdAt {
             stringDate = dateFormatter.getStringFromDate(from: date)
@@ -97,13 +87,10 @@ private extension ImagesListViewController {
         cell.cellImageView.kf.setImage(with: url,
                               placeholder: UIImage(named: "ic.scribble.variable"),
                               options: [.transition(.fade(1))]) { [weak self] result in
-            guard let self = self else {return}
+            guard let self else {return}
             switch result {
             case .success(let value):
                 cell.configure(image: value.image, date: stringDate, isLiked: photos[indexPath.row].isLiked)
-                // при обновлении фото в ячейке нужно перегрузить ячейку, чтобы обновилась её высота
-                // некоторые ячейки не отрисовываются при быстрой прокрутке вверх
-                // self.tableView.reloadRows(at: [indexPath], with: .automatic)
                 
                 let cacheType: String
                 switch value.cacheType {
@@ -116,8 +103,6 @@ private extension ImagesListViewController {
                 }
                 
                 print("DEBUG",
-//                      "[\(String(describing: self)).\(#function)]:",
-//                      "Image - \(value.image)",
                       "Image loaded from - \(cacheType)",
                       "Source - \(value.source)",
                       separator: "\n")
@@ -131,14 +116,10 @@ private extension ImagesListViewController {
                 cell.configure(image: placeholder, date: stringDate, isLiked: photos[indexPath.row].isLiked)
             }
         }
-
-        let selectedView = UIView()
-        selectedView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.2)
-        cell.selectedBackgroundView = selectedView
     }
     
     // MARK: - Alerts
-    func showLikeErrorAlert(vc: ImagesListViewController) {
+    private func showLikeErrorAlert(vc: ImagesListViewController) {
         let alertModel = AlertModel(
             title: "Ошибка!",
             message: "Не удалось поставить лайк",
@@ -149,8 +130,15 @@ private extension ImagesListViewController {
         AlertPresenter.showAlert(on: vc, model: alertModel)
     }
     
+    // MARK: - UI
+    private func setupUI() {
+        view.backgroundColor = .ypBlack
+        view.addSubview(tableView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
     // MARK: - Constraints
-    func setupConstraints() {
+    private func setupConstraints() {
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
