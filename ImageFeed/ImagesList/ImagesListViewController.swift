@@ -74,14 +74,18 @@ final class ImagesListViewController: UIViewController {
     
     // MARK: - Cell
     private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
+        
+        guard let photo = photos[safeIndex: indexPath.row] else { return }
+        
         let stringDate: String
-        if let date = photos[indexPath.row].createdAt {
+        
+        if let date = photo.createdAt {
             stringDate = dateFormatter.getStringFromDate(from: date)
         } else {
             stringDate = ""
         }
 
-        guard let url = URL(string: photos[indexPath.row].smallImageURL) else {return}
+        guard let url = URL(string: photo.smallImageURL) else {return}
         
         cell.cellImageView.kf.indicatorType = .activity
         cell.cellImageView.kf.setImage(with: url,
@@ -90,7 +94,7 @@ final class ImagesListViewController: UIViewController {
             guard let self else {return}
             switch result {
             case .success(let value):
-                cell.configure(image: value.image, date: stringDate, isLiked: photos[indexPath.row].isLiked)
+                cell.configure(image: value.image, date: stringDate, isLiked: photo.isLiked)
                 
                 let cacheType: String
                 switch value.cacheType {
@@ -113,7 +117,7 @@ final class ImagesListViewController: UIViewController {
                       "Error loading image:",
                       error.localizedDescription)
                 guard let placeholder = UIImage(named: "ic.scribble.variable") else {return}
-                cell.configure(image: placeholder, date: stringDate, isLiked: photos[indexPath.row].isLiked)
+                cell.configure(image: placeholder, date: stringDate, isLiked: photo.isLiked)
             }
         }
     }
@@ -175,7 +179,8 @@ extension ImagesListViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let photo = photos[indexPath.row]
+        guard let photo = photos[safeIndex: indexPath.row] else { return 200 }
+
         let imageInsets = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
         let imageViewWidth = tableView.bounds.width - imageInsets.left - imageInsets.right
         let imageWidth = photo.size.width
