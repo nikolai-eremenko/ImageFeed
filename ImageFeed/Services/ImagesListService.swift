@@ -9,63 +9,49 @@ import Foundation
 
 final class ImagesListService {
     // MARK: - properties
-    static let shared = ImagesListService()
-    
     private let urlSession = URLSession.shared
-    private var task: URLSessionTask?
-    private(set) var photos: [Photo] = [] {
-        didSet {
-            NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: nil)
-        }
-    }
-    private var lastLoadedPage: (number: Int, total: Int)?
+    private var fetchPhotosTask: URLSessionTask?
+    private var changeLikeTask: URLSessionTask?
+    private(set) var photos = [Photo]()
+    private var lastLoadedPage: Int = 0
     private let perPage: Int = 10
     private let tokenStorage = OAuth2TokenStorage.shared
     
     static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
+
     
-    // MARK: - Init
-    private init() { }
-    
-    // MARK: - Public methods
-    // Скачивать больше одной страницы за раз не будем; если идёт закачка — будем отправлять новый запрос только после её завершения.
-    func fetchPhotosNextPage(_ token: String, completion: @escaping (Result<[Photo], Error>) -> Void) {
-        
+    // MARK: - Fetch photos
+    func fetchPhotosNextPage() {
         assert(Thread.isMainThread)
         
-        // если идёт закачка, то нового сетевого запроса не создаётся, а выполнение функции прерывается;
-        guard task == nil else {
-            print("DEBUG",
-                  "[\(String(describing: self)).\(#function)]:",
-                  "Task is already in progress!",
-                  separator: "\n")
-            return
-        }
-        
-        // Здесь получим страницу номер 1, если ещё не загружали ничего,
-        // и следующую страницу (на единицу больше), если есть предыдущая загруженная страница
-        
-        // функция внутри себя определяет номер следующей страницы для закачки (номер не должен сообщаться извне, как параметр функции);
-        let nextPage = (lastLoadedPage?.number ?? 0) + 1
-        
         guard
-            let request = Endpoint.getImages(token: token, page: nextPage, perPage: perPage).request
+            let token = tokenStorage.token,
+            fetchPhotosTask == nil
         else {
             return
         }
         
-        print("LIST IMAGES REQUEST: \(request)")
+        let nextPage = lastLoadedPage + 1
+        
+        guard
+            let request = Endpoint.getImages(token: token, page: nextPage, perPage: perPage).request
+        else {
+            print("cannot create URL")
+            return
+        }
         
         let task = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
-            guard let self = self else { return }
+            guard let self else { return }
             
             switch result {
             case .success(let object):
+                let photos = object.map { Photo(photoResult: $0) }
+                
                 DispatchQueue.main.async {
-                    let photoResults = object.map { Photo(from: $0) }
-                    self.photos.append(contentsOf: photoResults)
-                    self.lastLoadedPage?.number = nextPage
-                    NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: nil)
+                    self.photos.append(contentsOf: photos)
+                    self.lastLoadedPage = nextPage
+                    NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
+                    self.fetchPhotosTask = nil
                 }
             case .failure(let error):
                 print("DEBUG",
@@ -73,12 +59,67 @@ final class ImagesListService {
                       "Error while fetching images:",
                       error.localizedDescription,
                       separator: "\n")
-            }
-            DispatchQueue.main.async {
-                self.task = nil
+                DispatchQueue.main.async {
+                    self.fetchPhotosTask = nil
+                }
             }
         }
-        self.task = task
+        self.fetchPhotosTask = task
         task.resume()
+    }
+    
+    // MARK: - Change like
+    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
+        assert(Thread.isMainThread)
+        
+        if changeLikeTask != nil {
+            print("DEBUG",
+                  "[\(String(describing: self)).\(#function)]:",
+                  "Change like task is already in progress!",
+                  separator: "\n")
+            changeLikeTask?.cancel()
+        }
+        
+        guard let token = tokenStorage.token else { return }
+        
+        guard
+            let request = Endpoint.changeLike(photoId: photoId, isLike: isLike, token: token).request
+        else {
+            completion(.failure(NetworkError.invalidRequest))
+            return
+        }
+        
+        let task = urlSession.dataTask(with: request) { [weak self] (data, response, error) in
+            
+            guard let self else { return }
+            
+            if let error = error {
+                self.changeLikeTask = nil
+                completion(.failure(error))
+                print("DEBUG",
+                      "[\(String(describing: self)).\(#function)]:",
+                      "Error while changing like:",
+                      error.localizedDescription,
+                      separator: "\n")
+                return
+            }
+            
+            if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
+                let photo = self.photos[index]
+                let newPhoto = Photo(photo: photo, isLiked: !photo.isLiked)
+                DispatchQueue.main.async {
+                    self.photos = self.photos.withReplaced(itemAt: index, newValue: newPhoto)
+                }
+                
+                completion(.success(Void()))
+                self.changeLikeTask = nil
+            }
+        }
+        changeLikeTask = task
+        task.resume()
+    }
+    
+    func cleanImagesList() {
+        photos.removeAll()
     }
 }

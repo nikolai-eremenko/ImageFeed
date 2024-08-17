@@ -13,7 +13,8 @@ final class ProfileViewController: UIViewController {
     //MARK: - Properties
     private let profileService = ProfileService.shared
     private let storage = OAuth2TokenStorage.shared
-    private let imageService = ProfileImageService.shared
+    private let profileImageService = ProfileImageService.shared
+    private let profileLogoutService = ProfileLogoutService.shared
     private var profileImageServiceObserver: NSObjectProtocol?
     
     //MARK: - UI Components
@@ -119,10 +120,10 @@ private extension ProfileViewController {
     
     func updateAvatar() {
         guard
-            let profileImageURL = imageService.avatarURL,
+            let profileImageURL = profileImageService.avatarURL,
             let url = URL(string: profileImageURL)
         else {
-//            profilePhoto.image = UIImage(named: "ic.person.crop.circle.fill")
+            profilePhoto.image = UIImage(named: "ic.person.crop.circle.fill")
             return
         }
         
@@ -165,14 +166,25 @@ private extension ProfileViewController {
         }
     }
     
+    // MARK: - Logout Alert
+    func showLogoutAlert(vc: ProfileViewController) {
+        let alertModel = AlertModel(
+            title: "Пока, пока!",
+            message: "Уверенные что хотите выйти?",
+            buttons: [.yesButton, .noButton],
+            identifier: "Logout",
+            completion: {
+                self.profileLogoutService.logout()
+            }
+        )
+        AlertPresenter.showAlert(on: vc, model: alertModel)
+    }
+    
     //MARK: - Actions
     @objc
     func logoutAction() {
-        storage.removeTokenKey()
         dismiss(animated: true)
-        print("DEBUG",
-              "[\(String(describing: self)).\(#function)]:",
-              "Logout button pressed")
+        showLogoutAlert(vc: self)
     }
     
     // MARK: - Constraints

@@ -21,7 +21,7 @@ struct AlertPresenter {
     private static func showBasicAlert(on vc: UIViewController,
                                        title: String,
                                        message: String,
-                                       buttons: [String],
+                                       buttons: [AlertButton],
                                        identifier: String,
                                        completion: @escaping () -> ()) {
         
@@ -34,11 +34,18 @@ struct AlertPresenter {
         alert.view.accessibilityIdentifier = identifier
         
         for button in buttons {
-            let action = UIAlertAction(title: button, style: .default) { _ in
-                completion()
+            switch button {
+            case .cancelButton, .noButton:
+                let action = UIAlertAction(title: button.title, style: .cancel, handler: nil)
+                action.accessibilityIdentifier = button.accessibilityIdentifier
+                alert.addAction(action)
+            default:
+                let action = UIAlertAction(title: button.title, style: .default) { _ in
+                    completion()
+                }
+                action.accessibilityIdentifier = button.accessibilityIdentifier
+                alert.addAction(action)
             }
-            action.accessibilityIdentifier = button
-            alert.addAction(action)
         }
         
         DispatchQueue.main.async {

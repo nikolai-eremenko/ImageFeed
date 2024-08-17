@@ -8,21 +8,38 @@
 import Foundation
 
 struct Photo {
+    private let dateFormatter = DateConvertor.shared
     let id: String
     let size: CGSize
     let createdAt: Date?
     let welcomeDescription: String?
-    let thumbImageURL: String
+    let fullImageURL: String
     let largeImageURL: String
+    let smallImageURL: String
+    let thumbImageURL: String
     let isLiked: Bool
     
-    init(from photoResult: PhotoResult) {
+    init(photoResult: PhotoResult) {
         self.id = photoResult.id
         self.size = CGSize(width: photoResult.width, height: photoResult.height)
-        self.createdAt = DateFormatter.photoDateFormatter.date(from: photoResult.createdAt)
+        self.createdAt = dateFormatter.getDateFromString(from: photoResult.createdAt)
         self.welcomeDescription = photoResult.description
-        self.thumbImageURL = photoResult.urls.thumb
+        self.fullImageURL = photoResult.urls.full
         self.largeImageURL = photoResult.urls.regular
+        self.smallImageURL = photoResult.urls.small
+        self.thumbImageURL = photoResult.urls.thumb
         self.isLiked = photoResult.likedByUser
+    }
+    
+    init(photo: Photo, isLiked: Bool) {
+        self.id = photo.id
+        self.size = photo.size
+        self.createdAt = photo.createdAt
+        self.welcomeDescription = photo.welcomeDescription
+        self.fullImageURL = photo.fullImageURL
+        self.largeImageURL = photo.largeImageURL
+        self.smallImageURL = photo.smallImageURL
+        self.thumbImageURL = photo.thumbImageURL
+        self.isLiked = isLiked
     }
 }

@@ -8,7 +8,7 @@
 import UIKit
 
 struct ImageCellModel {
-    let cardImageView: UIImage
-    let dateLabel: String
+    let photo: UIImageView
+    let date: String
     let likeButtonColor: UIColor
 }
