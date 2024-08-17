@@ -76,12 +76,16 @@ private extension AuthViewController {
     // MARK: - Actions
     @objc
     func switchToWebViewController() {
-        let webViewController = WebViewViewController()
+        let webViewViewController = WebViewViewController()
+        let authHelper = AuthHelper()
+        let webViewPresenter = WebViewPresenter(authHelper: authHelper)
         
-        webViewController.delegate = self
+        webViewViewController.presenter = webViewPresenter
+        webViewPresenter.view = webViewViewController
+        webViewViewController.delegate = self
         
-        webViewController.modalPresentationStyle = .overFullScreen
-        present(webViewController, animated: true)
+        webViewViewController.modalPresentationStyle = .overFullScreen
+        present(webViewViewController, animated: true)
     }
     
     // MARK: - Constraints

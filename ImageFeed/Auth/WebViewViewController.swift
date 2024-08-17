@@ -13,15 +13,28 @@ protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
 }
 
-final class WebViewViewController: UIViewController {
+public protocol WebViewViewControllerProtocol: AnyObject {
+    var presenter: WebViewPresenterProtocol? { get set }
+    func load(request: URLRequest)
+    func setProgressValue(_ newValue: Float)
+    func setProgressHidden(_ isHidden: Bool)
+}
+
+final class WebViewViewController: UIViewController & WebViewViewControllerProtocol {
     // MARK: - Properties
-    private var estimatedProgressObservation: NSKeyValueObservation?
+    
     weak var delegate: WebViewViewControllerDelegate?
+    var presenter: WebViewPresenterProtocol?
+    
+    var test = "test"
+    
+    private var estimatedProgressObservation: NSKeyValueObservation?
     
     // MARK: - UI Components
     private lazy var webView: WKWebView = {
         let configuration = WKWebViewConfiguration()
         let view = WKWebView(frame: .zero, configuration: configuration)
+        view.navigationDelegate = self
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -48,48 +61,36 @@ final class WebViewViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        setupConstraints()
-        webView.navigationDelegate = self
         
-        loadAuthView()
-        estimatedProgressObservation = webView.observe(
-                    \.estimatedProgress,
-                    options: [],
-                    changeHandler: { [weak self] _, _ in
-                        guard let self = self else { return }
-                        self.updateProgress()
-                    })
+        presenter?.viewDidLoad()
+        
+//        presenter?.didUpdateProgressValue(webView.estimatedProgress)
+        
+        addObserver()
+
+    }
+    
+    func load(request: URLRequest) {
+        webView.load(request)
+    }
+    
+    func setProgressValue(_ newValue: Float) {
+        progressView.progress = newValue
+    }
+    
+    func setProgressHidden(_ isHidden: Bool) {
+        progressView.isHidden = isHidden
     }
 }
 
 private extension WebViewViewController {
-    func loadAuthView() {
-        guard let request = Endpoint.authorize().request else {
-            print("ERROR: cannot create URL")
-            return
-        }
-        
-        webView.load(request)
-        updateProgress()
-    }
     
-    func code(from navigationAction: WKNavigationAction) -> String? {
-        if
-            let url = navigationAction.request.url,
-            let urlComponents = URLComponents(string: url.absoluteString),
-            urlComponents.path == "/oauth/authorize/native",
-            let items = urlComponents.queryItems,
-            let codeItem = items.first(where: { $0.name == "code" })
-        {
-            return codeItem.value
-        } else {
-            return nil
-        }
-    }
-    
-    func updateProgress() {
-        progressView.progress = Float(webView.estimatedProgress)
-        progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
+    func addObserver() {
+        estimatedProgressObservation = webView.observe(\.estimatedProgress,
+                                                        options: [],
+                                                        changeHandler: { [weak self] _, _ in
+            guard let self = self else { return }
+            presenter?.didUpdateProgressValue(webView.estimatedProgress)})
     }
     
     func setupUI() {
@@ -98,6 +99,7 @@ private extension WebViewViewController {
         view.addSubview(webView)
         view.addSubview(progressView)
         view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        setupConstraints()
     }
     
     // MARK: - Actions
@@ -140,6 +142,13 @@ extension WebViewViewController: WKNavigationDelegate {
         } else {
             decisionHandler(.allow)
         }
+    }
+    
+    private func code(from navigationAction: WKNavigationAction) -> String? {
+        if let url = navigationAction.request.url {
+            return presenter?.code(from: url)
+        }
+        return nil
     }
 }
 

@@ -8,7 +8,6 @@
 import Foundation
 
 enum Endpoint {
-    
     case authorize(url: String = "/oauth/authorize")
     case sendCode(url: String = "/oauth/token", code: String)
     case getProfile(url: String = "/me", token: String)
@@ -30,9 +29,9 @@ enum Endpoint {
     
     private var url: URL? {
         var components = URLComponents()
-        components.scheme = Constants.API.scheme
+        components.scheme = Constants.scheme
         components.host = self.host
-        components.port = Constants.API.port
+        components.port = Constants.port
         components.path = self.path
         components.queryItems = self.queryItems
         return components.url
@@ -41,9 +40,9 @@ enum Endpoint {
     private var host: String {
         switch self {
         case .authorize, .sendCode:
-            return Constants.API.oauthBaseURL
+            return Constants.host
         case .getProfile, .getProfileImage, .getImages, .changeLike:
-            return Constants.API.baseURL
+            return Constants.api + "." + Constants.host
         }
     }
     
@@ -68,16 +67,16 @@ enum Endpoint {
         switch self {
         case .authorize:
             return [
-                URLQueryItem(name: "client_id", value: Constants.API.accessKey),
-                URLQueryItem(name: "redirect_uri", value: Constants.API.redirectURI),
+                URLQueryItem(name: "client_id", value: Constants.accessKey),
+                URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
                 URLQueryItem(name: "response_type", value: "code"),
-                URLQueryItem(name: "scope", value: Constants.API.accessScope)
+                URLQueryItem(name: "scope", value: Constants.accessScope)
             ]
         case .sendCode(_, let code):
             return [
-                URLQueryItem(name: "client_id", value: Constants.API.accessKey),
-                URLQueryItem(name: "client_secret", value: Constants.API.secretKey),
-                URLQueryItem(name: "redirect_uri", value: Constants.API.redirectURI),
+                URLQueryItem(name: "client_id", value: Constants.accessKey),
+                URLQueryItem(name: "client_secret", value: Constants.secretKey),
+                URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
                 URLQueryItem(name: "code", value: code),
                 URLQueryItem(name: "grant_type", value: "authorization_code")
             ]
