@@ -29,15 +29,6 @@ final class AuthHelper: AuthHelperProtocol {
         return request
     }
     
-//    func authURL() -> URL? {
-//        guard let request = configuration.endpoint.request else {
-//            print("ERROR: cannot create URL")
-//            return nil
-//        }
-//   
-//        return request.url
-//    }
-    
     func code(from url: URL) -> String? {
         if let urlComponents = URLComponents(string: url.absoluteString),
            urlComponents.path == "/oauth/authorize/native",
