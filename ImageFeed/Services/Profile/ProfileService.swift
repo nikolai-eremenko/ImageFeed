@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import WebKit
+import Kingfisher
 
 final class ProfileService {
     // MARK: - properties
@@ -14,6 +16,8 @@ final class ProfileService {
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private(set) var profile: Profile?
+    private let imagesListService = ImagesListService()
+    private let cache = ImageCache.default
     
     // MARK: - Init
     private init() { }
@@ -59,7 +63,50 @@ final class ProfileService {
         task.resume()
     }
     
-    func cleanProfile() {
-        profile = nil
+    func logout(_ vc: ProfileViewController) {
+        vc.dismiss(animated: true)
+        
+        UIBlockingProgressHUD.show()
+        
+        /// Wait for 3 seconds and then clean cookies
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            UIBlockingProgressHUD.dismiss()
+            self.profile = nil
+            self.cleanCookies()
+            self.cleanUserData()
+            self.switchToSplashScreen()
+        }
+    }
+}
+
+private extension ProfileService {
+    func cleanCookies() {
+        /// Очищаем все куки из хранилища
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+        /// Запрашиваем все данные из локального хранилища
+        WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+            /// Массив полученных записей удаляем из хранилища
+            records.forEach { record in
+                WKWebsiteDataStore.default().removeData(ofTypes: record.dataTypes, for: [record], completionHandler: {})
+            }
+        }
+    }
+    
+    func cleanUserData() {
+        ProfileImageService.shared.cleanProfileImage()
+        imagesListService.cleanImagesList()
+        OAuth2TokenStorage.shared.removeTokenKey()
+        cache.clearMemoryCache()
+        cache.clearDiskCache()
+    }
+    
+    func switchToSplashScreen() {
+        guard let window = UIApplication.shared.windows.first else {
+            assertionFailure("Invalid window configuration")
+            return
+        }
+        window.rootViewController = SplashViewController()
+        window.makeKeyAndVisible()
+        UIView.transition(with: window, duration: 0.3, options: [.transitionCrossDissolve], animations: nil, completion: nil)
     }
 }

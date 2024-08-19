@@ -18,12 +18,12 @@
 		910DD4B32C0DAC2000D57949 /* ImagesListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 910DD4B22C0DAC2000D57949 /* ImagesListCell.swift */; };
 		910DD4B62C0EDC4900D57949 /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 910DD4B52C0EDC4900D57949 /* GradientView.swift */; };
 		911018BB2C6C8260004F9E6C /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018BA2C6C8260004F9E6C /* Array+Extensions.swift */; };
-		911018BD2C6CB084004F9E6C /* ProfileLogoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018BC2C6CB084004F9E6C /* ProfileLogoutService.swift */; };
 		911018C32C6F137D004F9E6C /* DateConvertor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018C22C6F137D004F9E6C /* DateConvertor.swift */; };
 		911018C72C70979E004F9E6C /* WebViewPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018C62C70979E004F9E6C /* WebViewPresenter.swift */; };
 		911018C92C70AD5C004F9E6C /* AuthHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018C82C70AD5C004F9E6C /* AuthHelper.swift */; };
 		911018CB2C70B530004F9E6C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018CA2C70B530004F9E6C /* Constants.swift */; };
 		911018CF2C70B847004F9E6C /* AuthConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018CE2C70B847004F9E6C /* AuthConfiguration.swift */; };
+		911018E52C71B70B004F9E6C /* ProfileViewPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018E42C71B70B004F9E6C /* ProfileViewPresenter.swift */; };
 		9117F00B2C1AB16F0004D035 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9117F00A2C1AB16F0004D035 /* ProfileViewController.swift */; };
 		9131B9822C2E83BD00C8F344 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9131B9812C2E83BD00C8F344 /* AuthViewController.swift */; };
 		9131B9842C2E8D9900C8F344 /* WebViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9131B9832C2E8D9900C8F344 /* WebViewViewController.swift */; };
@@ -80,13 +80,13 @@
 		910DD4B52C0EDC4900D57949 /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 		910DD4D42C10418B00D57949 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		911018BA2C6C8260004F9E6C /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
-		911018BC2C6CB084004F9E6C /* ProfileLogoutService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileLogoutService.swift; sourceTree = "<group>"; };
 		911018C22C6F137D004F9E6C /* DateConvertor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateConvertor.swift; sourceTree = "<group>"; };
 		911018C62C70979E004F9E6C /* WebViewPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewPresenter.swift; sourceTree = "<group>"; };
 		911018C82C70AD5C004F9E6C /* AuthHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthHelper.swift; sourceTree = "<group>"; };
 		911018CA2C70B530004F9E6C /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		911018CE2C70B847004F9E6C /* AuthConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthConfiguration.swift; sourceTree = "<group>"; };
 		911018D42C70DFB8004F9E6C /* ImageFeedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImageFeedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		911018E42C71B70B004F9E6C /* ProfileViewPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewPresenter.swift; sourceTree = "<group>"; };
 		9117F00A2C1AB16F0004D035 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		9131B9812C2E83BD00C8F344 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
 		9131B9832C2E8D9900C8F344 /* WebViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewViewController.swift; sourceTree = "<group>"; };
@@ -205,6 +205,7 @@
 			isa = PBXGroup;
 			children = (
 				9117F00A2C1AB16F0004D035 /* ProfileViewController.swift */,
+				911018E42C71B70B004F9E6C /* ProfileViewPresenter.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -253,7 +254,6 @@
 				91E7F05A2C3FA5B000D9515B /* Auth */,
 				91F9A87E2C4A3065003E2B3A /* Profile */,
 				919AE5A72C65DD3D00109333 /* ImagesListService.swift */,
-				911018BC2C6CB084004F9E6C /* ProfileLogoutService.swift */,
 				911018C22C6F137D004F9E6C /* DateConvertor.swift */,
 			);
 			path = Services;
@@ -412,7 +412,6 @@
 				91E7F05C2C3FA8B300D9515B /* OAuth2Service.swift in Sources */,
 				91DAF7692C5A8DCE00F88ECE /* AlertPresenter.swift in Sources */,
 				91DAF7702C5B892300F88ECE /* ProfileImage.swift in Sources */,
-				911018BD2C6CB084004F9E6C /* ProfileLogoutService.swift in Sources */,
 				910DD4832C0C3B9200D57949 /* ImagesListViewController.swift in Sources */,
 				911018C72C70979E004F9E6C /* WebViewPresenter.swift in Sources */,
 				919AE5AC2C65E40C00109333 /* PhotoResult.swift in Sources */,
@@ -431,6 +430,7 @@
 				91F2303B2C526E9E00C763AB /* ProfileResult.swift in Sources */,
 				919AE5A82C65DD3D00109333 /* ImagesListService.swift in Sources */,
 				910DD47F2C0C3B9200D57949 /* AppDelegate.swift in Sources */,
+				911018E52C71B70B004F9E6C /* ProfileViewPresenter.swift in Sources */,
 				91E7F0542C3E642D00D9515B /* Endpoint.swift in Sources */,
 				916066A72C3C914400FBC4EA /* OAuth2TokenStorage.swift in Sources */,
 				910DD4812C0C3B9200D57949 /* SceneDelegate.swift in Sources */,

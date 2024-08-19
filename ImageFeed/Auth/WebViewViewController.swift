@@ -26,8 +26,6 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
     weak var delegate: WebViewViewControllerDelegate?
     var presenter: WebViewPresenterProtocol?
     
-    var test = "test"
-    
     private var estimatedProgressObservation: NSKeyValueObservation?
     
     // MARK: - UI Components
@@ -61,13 +59,10 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
         super.viewDidLoad()
         
         setupUI()
-        
+
         presenter?.viewDidLoad()
         
-//        presenter?.didUpdateProgressValue(webView.estimatedProgress)
-        
         addObserver()
-
     }
     
     func load(request: URLRequest) {

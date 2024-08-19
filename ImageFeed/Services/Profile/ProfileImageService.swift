@@ -55,6 +55,7 @@ final class ProfileImageService {
                 )
                 
                 self.avatarURL = profileImageURL
+                
                 DispatchQueue.main.async {
                     self.task = nil
                 }

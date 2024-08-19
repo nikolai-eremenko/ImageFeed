@@ -37,6 +37,8 @@ final class TabBarController: UITabBarController {
         )
         
         let profileViewController = ProfileViewController()
+        let profileViewPresenter = ProfileViewPresenter(view: profileViewController)
+        profileViewController.presenter = profileViewPresenter
         profileViewController.tabBarItem = UITabBarItem(
             title: nil,
             image: UIImage(systemName: "person.crop.circle.fill"),
