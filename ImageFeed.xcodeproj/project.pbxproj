@@ -162,60 +162,213 @@
 		910DD47D2C0C3B9200D57949 /* ImageFeed */ = {
 			isa = PBXGroup;
 			children = (
-				911018EC2C73CF52004F9E6C /* Presentation */,
-				910DD47E2C0C3B9200D57949 /* AppDelegate.swift */,
-				910DD4802C0C3B9200D57949 /* SceneDelegate.swift */,
-				91DAF7682C5A8DCE00F88ECE /* AlertPresenter.swift */,
-				91CE9BF42C3AB3FE004C61CD /* Models */,
+				910DD4892C0C3B9300D57949 /* LaunchScreen.storyboard */,
+				911019022C748EF5004F9E6C /* Application */,
+				911018F02C74855F004F9E6C /* SplashModule */,
+				9131B9802C2E839C00C8F344 /* AuthModule */,
+				911018F52C7487BC004F9E6C /* WebViewModule */,
+				911018F22C7485EA004F9E6C /* TabBarModule */,
+				910DD4B42C0DAC5000D57949 /* ImagesListModule */,
+				915749EA2C1ACB4C00E46541 /* ProfileModule */,
+				917636052C20661200965E95 /* SingleImageModule */,
+				911018FF2C74898D004F9E6C /* AlertModule */,
 				915749F02C1C74E800E46541 /* Helpers */,
 				91E7F04B2C3E5A2B00D9515B /* Services */,
-				910DD4872C0C3B9300D57949 /* Assets.xcassets */,
-				910DD4892C0C3B9300D57949 /* LaunchScreen.storyboard */,
-				910DD48C2C0C3B9300D57949 /* Info.plist */,
+				911019012C748AF0004F9E6C /* Resources */,
 			);
 			path = ImageFeed;
 			sourceTree = "<group>";
 		};
-		910DD4B42C0DAC5000D57949 /* ImagesList */ = {
+		910DD4B42C0DAC5000D57949 /* ImagesListModule */ = {
+			isa = PBXGroup;
+			children = (
+				911018FA2C748891004F9E6C /* Models */,
+				911018F92C748870004F9E6C /* Views */,
+				911018FB2C74889C004F9E6C /* Presenter */,
+			);
+			path = ImagesListModule;
+			sourceTree = "<group>";
+		};
+		911018F02C74855F004F9E6C /* SplashModule */ = {
+			isa = PBXGroup;
+			children = (
+				911018F32C74875B004F9E6C /* View */,
+			);
+			path = SplashModule;
+			sourceTree = "<group>";
+		};
+		911018F22C7485EA004F9E6C /* TabBarModule */ = {
+			isa = PBXGroup;
+			children = (
+				911018F82C74884C004F9E6C /* View */,
+			);
+			path = TabBarModule;
+			sourceTree = "<group>";
+		};
+		911018F32C74875B004F9E6C /* View */ = {
+			isa = PBXGroup;
+			children = (
+				91E7F0582C3ECC4300D9515B /* SplashViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		911018F42C74878A004F9E6C /* View */ = {
+			isa = PBXGroup;
+			children = (
+				9131B9812C2E83BD00C8F344 /* AuthViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		911018F52C7487BC004F9E6C /* WebViewModule */ = {
+			isa = PBXGroup;
+			children = (
+				911018F62C7487F7004F9E6C /* View */,
+				911018F72C74880F004F9E6C /* Presenter */,
+				911018C62C70979E004F9E6C /* WebViewPresenter.swift */,
+				911018C82C70AD5C004F9E6C /* AuthHelper.swift */,
+			);
+			path = WebViewModule;
+			sourceTree = "<group>";
+		};
+		911018F62C7487F7004F9E6C /* View */ = {
+			isa = PBXGroup;
+			children = (
+				9131B9832C2E8D9900C8F344 /* WebViewViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		911018F72C74880F004F9E6C /* Presenter */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Presenter;
+			sourceTree = "<group>";
+		};
+		911018F82C74884C004F9E6C /* View */ = {
+			isa = PBXGroup;
+			children = (
+				91DAF7742C5BA52100F88ECE /* TabBarController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		911018F92C748870004F9E6C /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				910DD4822C0C3B9200D57949 /* ImagesListViewController.swift */,
 				910DD4B22C0DAC2000D57949 /* ImagesListCell.swift */,
 			);
-			path = ImagesList;
+			path = Views;
 			sourceTree = "<group>";
 		};
-		911018EC2C73CF52004F9E6C /* Presentation */ = {
+		911018FA2C748891004F9E6C /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				91E7F0582C3ECC4300D9515B /* SplashViewController.swift */,
-				9131B9802C2E839C00C8F344 /* Auth */,
-				91DAF7742C5BA52100F88ECE /* TabBarController.swift */,
-				915749EA2C1ACB4C00E46541 /* Profile */,
-				910DD4B42C0DAC5000D57949 /* ImagesList */,
-				917636052C20661200965E95 /* SingleImage */,
+				919AE5A92C65DE8E00109333 /* Photo.swift */,
+				910086CC2C64C9D100E63834 /* ImageCellModel.swift */,
+				919AE5AB2C65E40C00109333 /* PhotoResult.swift */,
+				919AE5AD2C65E45400109333 /* UrlsResult.swift */,
 			);
-			path = Presentation;
+			path = Models;
 			sourceTree = "<group>";
 		};
-		9131B9802C2E839C00C8F344 /* Auth */ = {
+		911018FB2C74889C004F9E6C /* Presenter */ = {
 			isa = PBXGroup;
 			children = (
-				9131B9812C2E83BD00C8F344 /* AuthViewController.swift */,
-				9131B9832C2E8D9900C8F344 /* WebViewViewController.swift */,
-				911018C62C70979E004F9E6C /* WebViewPresenter.swift */,
-				911018C82C70AD5C004F9E6C /* AuthHelper.swift */,
 			);
-			path = Auth;
+			path = Presenter;
 			sourceTree = "<group>";
 		};
-		915749EA2C1ACB4C00E46541 /* Profile */ = {
+		911018FC2C7488C8004F9E6C /* Presenter */ = {
+			isa = PBXGroup;
+			children = (
+				911018E42C71B70B004F9E6C /* ProfileViewPresenter.swift */,
+			);
+			path = Presenter;
+			sourceTree = "<group>";
+		};
+		911018FD2C7488DA004F9E6C /* View */ = {
 			isa = PBXGroup;
 			children = (
 				9117F00A2C1AB16F0004D035 /* ProfileViewController.swift */,
-				911018E42C71B70B004F9E6C /* ProfileViewPresenter.swift */,
 			);
-			path = Profile;
+			path = View;
+			sourceTree = "<group>";
+		};
+		911018FE2C7488E4004F9E6C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				91F2303A2C526E9E00C763AB /* ProfileResult.swift */,
+				917ACF3C2C4A352800434CE7 /* Profile.swift */,
+				91DAF76F2C5B892300F88ECE /* ProfileImage.swift */,
+				910AF9D92C57680200AC2520 /* UserResult.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		911018FF2C74898D004F9E6C /* AlertModule */ = {
+			isa = PBXGroup;
+			children = (
+				911019002C748A73004F9E6C /* Model */,
+				91DAF7682C5A8DCE00F88ECE /* AlertPresenter.swift */,
+			);
+			path = AlertModule;
+			sourceTree = "<group>";
+		};
+		911019002C748A73004F9E6C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				91DAF76A2C5A8ED200F88ECE /* AlertModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		911019012C748AF0004F9E6C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				910DD4872C0C3B9300D57949 /* Assets.xcassets */,
+				910DD48C2C0C3B9300D57949 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		911019022C748EF5004F9E6C /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				910DD47E2C0C3B9200D57949 /* AppDelegate.swift */,
+				910DD4802C0C3B9200D57949 /* SceneDelegate.swift */,
+			);
+			path = Application;
+			sourceTree = "<group>";
+		};
+		911019032C7491E6004F9E6C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				916066A42C3C8F2700FBC4EA /* OAuthTokenResponseBody.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		9131B9802C2E839C00C8F344 /* AuthModule */ = {
+			isa = PBXGroup;
+			children = (
+				911019032C7491E6004F9E6C /* Models */,
+				911018F42C74878A004F9E6C /* View */,
+			);
+			path = AuthModule;
+			sourceTree = "<group>";
+		};
+		915749EA2C1ACB4C00E46541 /* ProfileModule */ = {
+			isa = PBXGroup;
+			children = (
+				911018FE2C7488E4004F9E6C /* Models */,
+				911018FD2C7488DA004F9E6C /* View */,
+				911018FC2C7488C8004F9E6C /* Presenter */,
+			);
+			path = ProfileModule;
 			sourceTree = "<group>";
 		};
 		915749F02C1C74E800E46541 /* Helpers */ = {
@@ -230,29 +383,12 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
-		917636052C20661200965E95 /* SingleImage */ = {
+		917636052C20661200965E95 /* SingleImageModule */ = {
 			isa = PBXGroup;
 			children = (
 				915749EB2C1ADF2B00E46541 /* SingleImageViewController.swift */,
 			);
-			path = SingleImage;
-			sourceTree = "<group>";
-		};
-		91CE9BF42C3AB3FE004C61CD /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				916066A42C3C8F2700FBC4EA /* OAuthTokenResponseBody.swift */,
-				917ACF3C2C4A352800434CE7 /* Profile.swift */,
-				91F2303A2C526E9E00C763AB /* ProfileResult.swift */,
-				910AF9D92C57680200AC2520 /* UserResult.swift */,
-				91DAF76F2C5B892300F88ECE /* ProfileImage.swift */,
-				91DAF76A2C5A8ED200F88ECE /* AlertModel.swift */,
-				910086CC2C64C9D100E63834 /* ImageCellModel.swift */,
-				919AE5A92C65DE8E00109333 /* Photo.swift */,
-				919AE5AB2C65E40C00109333 /* PhotoResult.swift */,
-				919AE5AD2C65E45400109333 /* UrlsResult.swift */,
-			);
-			path = Models;
+			path = SingleImageModule;
 			sourceTree = "<group>";
 		};
 		91E7F04B2C3E5A2B00D9515B /* Services */ = {
@@ -613,7 +749,7 @@
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ImageFeed/Info.plist;
+				INFOPLIST_FILE = ImageFeed/Resources/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -649,7 +785,7 @@
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ImageFeed/Info.plist;
+				INFOPLIST_FILE = ImageFeed/Resources/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
