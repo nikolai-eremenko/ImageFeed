@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Profile {
+public struct Profile {
     let username: String
     let name: String
     let loginName: String
@@ -18,5 +18,12 @@ struct Profile {
         self.name = "\(profileResult.firstName) \(profileResult.lastName ?? "")"
         self.loginName = "@\(profileResult.username)"
         self.bio = profileResult.bio
+    }
+    
+    public init(username: String, name: String, loginName: String, bio: String?) {
+        self.username = username
+        self.name = name
+        self.loginName = loginName
+        self.bio = nil
     }
 }

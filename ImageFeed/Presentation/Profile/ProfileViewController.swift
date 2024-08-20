@@ -10,13 +10,15 @@ import Kingfisher
 
 public protocol ProfileViewControllerProtocol: AnyObject {
     var presenter: ProfileViewPresenterProtocol? { get set }
-    func updateProfileDetails(name: String, login: String, bio: String)
+    func updateProfileDetails(with model: Profile)
     func updateAvatar(with url: URL)
     func showLogoutAlert(model: AlertModel)
 }
 
 final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
     var presenter: ProfileViewPresenterProtocol?
+    private let profileService = ProfileService.shared
+    private let profileImageService = ProfileImageService.shared
     
     //MARK: - UI Components
     private lazy var profileStackView: UIStackView = {
@@ -91,10 +93,12 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         
         setupViews()
         
-        presenter?.setProfileDetails()
         presenter?.addProfileImageServiceObserver()
-        ///  обсервер будет получать нотификации после момента добавления, но может так случиться, что запрос на получение аватарки уже успел завершиться. Поэтому в viewDidLoad  также пытаемся обновить аватарку.
-        presenter?.setAvatarURL()
+        presenter?.getProfileDetails(from: profileService.profile)
+        ///  обсервер будет получать нотификации после момента добавления,
+        ///  но может так случиться, что запрос на получение аватарки уже успел завершиться.
+        ///  Поэтому в viewDidLoad  также пытаемся обновить аватарку.
+        presenter?.getAvatarURL(from: profileImageService.avatarURL)
     }
 
     // MARK: - Avatar
@@ -141,10 +145,10 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     }
     
     // MARK: - Profile
-    func updateProfileDetails(name: String, login: String, bio: String) {
-        fullNameLabel.text = name
-        nickNameLabel.text = login
-        aboutLabel.text = bio
+    func updateProfileDetails(with model: Profile) {
+        fullNameLabel.text = model.name
+        nickNameLabel.text = model.loginName
+        aboutLabel.text = model.bio
     }
     
     // MARK: - Logout Alert

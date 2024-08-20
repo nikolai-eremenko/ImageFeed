@@ -9,10 +9,10 @@ import UIKit
 
 public protocol ProfileViewPresenterProtocol {
     var view: ProfileViewControllerProtocol? { get set }
-    func addProfileImageServiceObserver()
-    func setProfileDetails()
-    func setAvatarURL()
     func didTapLogoutButton()
+    func getAvatarURL(from stringURL: String?)
+    func getProfileDetails(from profile: Profile?)
+    func addProfileImageServiceObserver()
 }
 
 final class ProfileViewPresenter: ProfileViewPresenterProtocol {
@@ -37,18 +37,18 @@ final class ProfileViewPresenter: ProfileViewPresenterProtocol {
             queue: .main
         ) { [weak self] _ in
             guard let self = self else { return }
-            self.setAvatarURL()
+            self.getAvatarURL(from: self.profileImageService.avatarURL)
         }
     }
     
-    func setProfileDetails() {
-        guard let profile = profileService.profile else { return }
-        view?.updateProfileDetails(name: profile.name, login: profile.loginName, bio: profile.bio ?? "")
+    func getProfileDetails(from profile: Profile?) {
+        guard let profile = profile else { return }
+        view?.updateProfileDetails(with: profile)
     }
     
-    func setAvatarURL() {
+    func getAvatarURL(from stringURL: String?) {
         guard
-            let profileImageURL = profileImageService.avatarURL,
+            let profileImageURL = stringURL,
             let url = URL(string: profileImageURL)
         else {
             return
