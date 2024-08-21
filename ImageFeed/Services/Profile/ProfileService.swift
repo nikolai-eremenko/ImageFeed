@@ -9,13 +9,20 @@ import Foundation
 import WebKit
 import Kingfisher
 
-final class ProfileService {
+protocol ProfileServiceProtocol {
+    static var shared: Self { get }
+    var profile: Profile? { get set}
+    func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void)
+    func logout(_ vc: ProfileViewControllerProtocol)
+}
+
+final class ProfileService: ProfileServiceProtocol {
     // MARK: - properties
     static let shared = ProfileService()
     
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
-    private(set) var profile: Profile?
+    var profile: Profile?
     private let imagesListService = ImagesListService()
     private let cache = ImageCache.default
     
@@ -42,9 +49,9 @@ final class ProfileService {
             switch result {
             case .success(let object):
                 let profile = Profile(from: object)
-                self.profile = profile
                 completion(.success(profile))
                 DispatchQueue.main.async {
+                    self.profile = profile
                     self.task = nil
                 }
             case .failure(let error):
@@ -63,8 +70,8 @@ final class ProfileService {
         task.resume()
     }
     
-    func logout(_ vc: ProfileViewController) {
-        vc.dismiss(animated: true)
+    func logout(_ vc: ProfileViewControllerProtocol) {
+        vc.dismissView()
         
         UIBlockingProgressHUD.show()
         
@@ -93,7 +100,7 @@ private extension ProfileService {
     }
     
     func cleanUserData() {
-        ProfileImageService.shared.cleanProfileImage()
+        ProfileImageService.shared.clearProfileImageURL()
         imagesListService.cleanImagesList()
         OAuth2TokenStorage.shared.removeTokenKey()
         cache.clearMemoryCache()

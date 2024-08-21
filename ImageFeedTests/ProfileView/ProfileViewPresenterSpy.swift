@@ -5,32 +5,32 @@
 //  Created by Nikolai Eremenko on 19.08.2024.
 //
 
-import Foundation
-
-import ImageFeed
+@testable import ImageFeed
 import Foundation
 
 final class ProfileViewPresenterSpy: ProfileViewPresenterProtocol {
     var view: ProfileViewControllerProtocol?
-    
-    var setAvatarURLCalled: Bool = false
-    var setProfileDetailsCalled: Bool = false
-    var addProfileImageServiceObserverCalled: Bool = false
-    
-    func getAvatarURL() {
-        setAvatarURLCalled = true
-    }
-    
-    func getProfileDetails() { 
-        setProfileDetailsCalled = true
-    }
-    
-    func addProfileImageServiceObserver() {
-        addProfileImageServiceObserverCalled = true
-    }
+    var viewDidLoadCalled: Bool = false
+
     
     func didTapLogoutButton() {
         
+    }
+    
+    func addProfileImageServiceObserver() {
+        
+    }
+    
+    func getProfileDetails() {
+        
+    }
+    
+    func getProfileImageURL() {
+        
+    }
+    
+    func viewDidLoad() {
+        viewDidLoadCalled = true
     }
     
 }

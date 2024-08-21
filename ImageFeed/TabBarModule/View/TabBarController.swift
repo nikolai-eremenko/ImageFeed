@@ -36,9 +36,7 @@ final class TabBarController: UITabBarController {
             selectedImage: nil
         )
         
-        let profileViewController = ProfileViewController()
-        let profileViewPresenter = ProfileViewPresenter(view: profileViewController)
-        profileViewController.presenter = profileViewPresenter
+        let profileViewController = ModuleBuilder.createProfileModule()
         profileViewController.tabBarItem = UITabBarItem(
             title: nil,
             image: UIImage(systemName: "person.crop.circle.fill"),

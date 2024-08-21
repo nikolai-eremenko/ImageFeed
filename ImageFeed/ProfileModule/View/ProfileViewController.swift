@@ -8,17 +8,18 @@
 import UIKit
 import Kingfisher
 
-public protocol ProfileViewControllerProtocol: AnyObject {
+protocol ProfileViewControllerProtocol: AnyObject {
     var presenter: ProfileViewPresenterProtocol? { get set }
-    func updateProfileDetails(with model: Profile)
-    func updateAvatar(with url: URL)
     func showLogoutAlert(model: AlertModel)
+    func dismissView()
+    func updateProfileDetails(with model: Profile)
+    func updateProfileImage(with stringURL: String?)
+    func failureProfileDetails(error: Error)
+    func failureProfileImage(error: Error)
 }
 
-final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
+final class ProfileViewController: UIViewController {
     var presenter: ProfileViewPresenterProtocol?
-    private let profileService = ProfileService.shared
-    private let profileImageService = ProfileImageService.shared
     
     //MARK: - UI Components
     private lazy var profileStackView: UIStackView = {
@@ -91,18 +92,72 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        presenter?.viewDidLoad()
         setupViews()
-        
-        presenter?.addProfileImageServiceObserver()
-        presenter?.getProfileDetails(from: profileService.profile)
-        ///  обсервер будет получать нотификации после момента добавления,
-        ///  но может так случиться, что запрос на получение аватарки уже успел завершиться.
-        ///  Поэтому в viewDidLoad  также пытаемся обновить аватарку.
-        presenter?.getAvatarURL(from: profileImageService.avatarURL)
     }
+    
+    // MARK: - Logout Alert
+    func showLogoutAlert(model: AlertModel) {
+        AlertPresenter.showAlert(on: self, model: model)
+    }
+}
 
-    // MARK: - Avatar
-    func updateAvatar(with url: URL) {
+private extension ProfileViewController {
+    //MARK: - Actions
+    @objc
+    func logoutAction() {
+        presenter?.didTapLogoutButton()
+    }
+    
+    // MARK: - Constraints
+    func setupViews() {
+        view.backgroundColor = .ypBlack
+        view.addSubview(profileStackView)
+        profileStackView.translatesAutoresizingMaskIntoConstraints = false
+        profileStackView.addArrangedSubview(headerStackView)
+        profileStackView.addArrangedSubview(fullNameLabel)
+        profileStackView.addArrangedSubview(nickNameLabel)
+        profileStackView.addArrangedSubview(aboutLabel)
+        headerStackView.addArrangedSubview(profilePhotoImageView)
+        headerStackView.addArrangedSubview(logoutButton)
+        setupConstraints()
+    }
+    
+    func setupConstraints() {
+        NSLayoutConstraint.activate([
+            profileStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            profileStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            profileStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            profilePhotoImageView.widthAnchor.constraint(equalToConstant: 70),
+            profilePhotoImageView.heightAnchor.constraint(equalToConstant: 70)
+        ])
+    }
+}
+
+extension ProfileViewController: ProfileViewControllerProtocol {
+    
+    // MARK: - Profile
+    func updateProfileDetails(with model: Profile) {
+        fullNameLabel.text = model.name
+        nickNameLabel.text = model.loginName
+        aboutLabel.text = model.bio
+    }
+    
+    func failureProfileDetails(error: any Error) {
+        // TODO: - Show alert
+        print("DEBUG",
+              "[\(String(describing: self)).\(#function)]:",
+              "ProfileService error -",
+              error.localizedDescription,
+              separator: "\n")
+    }
+    
+    // MARK: - ProfileImage
+    func updateProfileImage(with stringURL: String?) {
+        guard let stringURL,
+              let url = URL(string: stringURL) else {
+            return
+        }
         let processor = RoundCornerImageProcessor(radius: .point(61))
         let pngSerializer = FormatIndicatedCacheSerializer.png
         let placeholderImage = UIImage(named: "ic.person.crop.circle.fill")
@@ -116,7 +171,6 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
                 .transition(.fade(1))
             ]
         ) { result in
-            
             switch result {
             case .success(let value):
                 let cacheType: String
@@ -144,50 +198,18 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         }
     }
     
-    // MARK: - Profile
-    func updateProfileDetails(with model: Profile) {
-        fullNameLabel.text = model.name
-        nickNameLabel.text = model.loginName
-        aboutLabel.text = model.bio
+    func failureProfileImage(error: any Error) {
+        profilePhotoImageView.image = UIImage(named: "ic.person.crop.circle.fill")
+        print("DEBUG",
+              "[\(String(describing: self)).\(#function)]:",
+              "ProfileImageService error ->",
+              error.localizedDescription,
+              separator: "\n")
     }
     
-    // MARK: - Logout Alert
-    func showLogoutAlert(model: AlertModel) {
-        AlertPresenter.showAlert(on: self, model: model)
-    }
-}
-
-private extension ProfileViewController {
-    
-    //MARK: - Actions
-    @objc
-    func logoutAction() {
-        presenter?.didTapLogoutButton()
-    }
-    
-    // MARK: - Constraints
-    func setupViews() {
-        view.backgroundColor = .ypBlack
-        view.addSubview(profileStackView)
-        profileStackView.translatesAutoresizingMaskIntoConstraints = false
-        profileStackView.addArrangedSubview(headerStackView)
-        profileStackView.addArrangedSubview(fullNameLabel)
-        profileStackView.addArrangedSubview(nickNameLabel)
-        profileStackView.addArrangedSubview(aboutLabel)
-        headerStackView.addArrangedSubview(profilePhotoImageView)
-        headerStackView.addArrangedSubview(logoutButton)
-        
-        setupConstraints()
-    }
-    
-    func setupConstraints() {
-        NSLayoutConstraint.activate([
-            profileStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            profileStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            profileStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            profilePhotoImageView.widthAnchor.constraint(equalToConstant: 70),
-            profilePhotoImageView.heightAnchor.constraint(equalToConstant: 70)
-        ])
+    // MARK: - Dismiss View
+    func dismissView() {
+        dismiss(animated: true)
     }
 }
 

@@ -7,16 +7,23 @@
 
 import Foundation
 
-final class ProfileImageService {
+protocol ProfileImageServiceProtocol {
+    static var shared: Self { get }
+//    static var didChangeNotification: Notification.Name { get }
+    var avatarURL: String? { get set }
+    func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void)
+    func clearProfileImageURL()
+}
+
+final class ProfileImageService: ProfileImageServiceProtocol {
     static let shared = ProfileImageService()
+//    static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
     
     private let storage = OAuth2TokenStorage.shared
     
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
-    private(set) var avatarURL: String?
-    
-    static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
+    var avatarURL: String?
     
     private init() { }
     
@@ -48,11 +55,11 @@ final class ProfileImageService {
                 let profileImageURL = object.profileImage.large
                 completion(.success(profileImageURL))
                 
-                NotificationCenter.default.post(
-                    name: ProfileImageService.didChangeNotification,
-                    object: self,
-                    userInfo: ["URL": profileImageURL]
-                )
+//                NotificationCenter.default.post(
+//                    name: ProfileImageService.didChangeNotification,
+//                    object: self,
+//                    userInfo: ["URL": profileImageURL]
+//                )
                 
                 self.avatarURL = profileImageURL
                 
@@ -76,7 +83,7 @@ final class ProfileImageService {
         task.resume()
     }
     
-    func cleanProfileImage() {
+    func clearProfileImageURL() {
         avatarURL = nil
     }
 }

@@ -7,16 +7,18 @@
 
 import SwiftKeychainWrapper
 
-private struct KeychainKeys {
+protocol OAuth2TokenStorageProtocol {
+    static var shared: Self { get }
+    var token: String? { get set }
+    func removeTokenKey()
+}
+
+struct KeychainKeys {
      static let tokenKey: String = "token"
 }
 
-final class OAuth2TokenStorage {
-    
+final class OAuth2TokenStorage: OAuth2TokenStorageProtocol {
     static let shared = OAuth2TokenStorage()
-    
-    private init() {}
-    
     private var keychainWrapper = KeychainWrapper.standard
     
     var token: String? {
@@ -38,6 +40,8 @@ final class OAuth2TokenStorage {
             }
         }
     }
+    
+    private init() {}
     
     /// Removes token key from the keychain
     func removeTokenKey() {

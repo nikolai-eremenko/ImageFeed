@@ -24,6 +24,6 @@ public struct Profile {
         self.username = username
         self.name = name
         self.loginName = loginName
-        self.bio = nil
+        self.bio = bio
     }
 }
