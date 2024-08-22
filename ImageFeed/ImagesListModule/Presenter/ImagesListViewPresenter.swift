@@ -14,12 +14,12 @@ protocol ImagesListViewPresenterProtocol {
     func viewDidLoad()
     func fetchPhotosNextPage()
     func didTapLikeButton(cell: ImagesListCell)
-    func tapOnImage(imageURL: URL?)
+    func didTapImage(indexPath: IndexPath)
+    
 }
 
 final class ImagesListViewPresenter: ImagesListViewPresenterProtocol {
     weak var view: ImagesListViewControllerProtocol?
-    var router: ImagesListRouterProtocol?
     let dateFormatter: DateConvertorProtocol
     private let imagesListService: ImagesListServiceProtocol
     private var imageListServiceObserver: NSObjectProtocol?
@@ -28,13 +28,11 @@ final class ImagesListViewPresenter: ImagesListViewPresenterProtocol {
     init(
         view: ImagesListViewControllerProtocol,
         imagesListService: ImagesListServiceProtocol,
-        dateFormatter: DateConvertorProtocol,
-        router: ImagesListRouterProtocol
+        dateFormatter: DateConvertorProtocol
     ) {
         self.view = view
         self.imagesListService = imagesListService
         self.dateFormatter = dateFormatter
-        self.router = router
     }
     
     func viewDidLoad() {
@@ -46,8 +44,17 @@ final class ImagesListViewPresenter: ImagesListViewPresenterProtocol {
         imagesListService.fetchPhotosNextPage()
     }
     
-    func tapOnImage(imageURL: URL?) {
-        router?.showSingleImage(imageURL: imageURL)
+    func didTapImage(indexPath: IndexPath) {
+        guard let imageURL = URL(string: photos[indexPath.row].fullImageURL) else { return }
+        
+        let viewController = SingleImageViewController()
+        let presenter = SingleImageViewPresenter(view: viewController, imageURL: imageURL)
+        viewController.presenter = presenter
+        presenter.view = viewController
+        
+        viewController.modalPresentationStyle = .fullScreen
+        
+        view?.showSingleImage(vc: viewController)
     }
     
     // MARK: - Like

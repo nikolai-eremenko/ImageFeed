@@ -12,6 +12,7 @@ protocol ImagesListViewControllerProtocol: AnyObject {
     var presenter: ImagesListViewPresenterProtocol? { get set }
     var tableView: UITableView { get }
     func showLikeErrorAlert(model: AlertModel)
+    func showSingleImage(vc: UIViewController)
 }
 
 final class ImagesListViewController: UIViewController, ImagesListViewControllerProtocol {
@@ -88,6 +89,10 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
         }
     }
     
+    func showSingleImage(vc: UIViewController) {
+        present(vc, animated: true)
+    }
+    
     // MARK: - Alerts
     func showLikeErrorAlert(model: AlertModel) {
         AlertPresenter.showAlert(on: self, model: model)
@@ -150,15 +155,7 @@ extension ImagesListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let presenter = presenter else { return }
-        guard let imageURL = URL(string: presenter.photos[indexPath.row].fullImageURL) else { return }
-        
-        presenter.tapOnImage(imageURL: imageURL)
-        
-//        let viewController = SingleImageViewController()
-//        viewController.fullImageURL = fullImageURL
-//        viewController.modalPresentationStyle = .fullScreen
-//        present(viewController, animated: true)
+        presenter?.didTapImage(indexPath: indexPath)
     }
 }
 

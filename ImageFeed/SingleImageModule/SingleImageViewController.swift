@@ -16,8 +16,6 @@ protocol SingleImageViewControllerProtocol: AnyObject {
 final class SingleImageViewController: UIViewController, SingleImageViewControllerProtocol{
     var presenter: SingleImageViewPresenterProtocol?
     
-//    var fullImageURL: URL?
-    
     var image: UIImage? {
         didSet {
             guard isViewLoaded, let image else { return }
@@ -65,7 +63,6 @@ final class SingleImageViewController: UIViewController, SingleImageViewControll
         
         setupUI()
         setupConstraints()
-        
         presenter?.viewDidLoad()
     }
     
@@ -81,8 +78,8 @@ final class SingleImageViewController: UIViewController, SingleImageViewControll
                 DispatchQueue.main.async {
                     self.rescaleAndCenterImageInScrollView(image: imageResult.image)
                 }
-            case .failure(let error):
-                self.showError(vc: self)
+            case .failure(_):
+                self.showImageErrorAlert(vc: self)
             }
         }
     }
@@ -90,16 +87,9 @@ final class SingleImageViewController: UIViewController, SingleImageViewControll
 
 private extension SingleImageViewController {
     // MARK: - Error Alert
-    func showError(vc: SingleImageViewController) {
-        let alertModel = AlertModel(
-            title: "Что-то пошло не так!",
-            message: "Попробовать ещё раз?",
-            buttons: [.cancelButton, .retryButton],
-            identifier: "SingleImageError",
-            completion: {
-//                self.showFullImage()
-            }
-        )
+    func showImageErrorAlert(vc: SingleImageViewController) {
+        guard let alertModel = presenter?.getErrorAlert() else { return }
+        
         AlertPresenter.showAlert(on: vc, model: alertModel)
     }
     
@@ -126,7 +116,7 @@ private extension SingleImageViewController {
     // MARK: - Actions
     @objc
     func didTapBackButton() {
-        presenter?.didTapBackButton()
+        dismiss(animated: true)
     }
     
     @objc

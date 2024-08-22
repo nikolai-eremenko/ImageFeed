@@ -10,17 +10,15 @@ import Foundation
 protocol SingleImageViewPresenterProtocol {
     var view: SingleImageViewControllerProtocol? { get set }
     func viewDidLoad()
-    func didTapBackButton()
+    func getErrorAlert() -> AlertModel
 }
 
 final class SingleImageViewPresenter: SingleImageViewPresenterProtocol {
     weak var view: SingleImageViewControllerProtocol?
     var fullImageURL: URL?
-    var router: ImagesListRouterProtocol?
     
-    init(view: SingleImageViewControllerProtocol, router: ImagesListRouterProtocol, imageURL: URL?) {
+    init(view: SingleImageViewControllerProtocol, imageURL: URL?) {
         self.view = view
-        self.router = router
         self.fullImageURL = imageURL
     }
     
@@ -33,7 +31,21 @@ final class SingleImageViewPresenter: SingleImageViewPresenterProtocol {
         self.view?.showFullImage(with: imageURL)
     }
     
-    func didTapBackButton() {
-        router?.popToRoot()
+    // MARK: - Alert
+    func getErrorAlert() -> AlertModel {
+        let model = AlertModel(
+            title: "Что-то пошло не так!",
+            message: "Попробовать ещё раз?",
+            buttons: [.cancelButton, .retryButton],
+            identifier: "SingleImageError",
+            completion: { [weak self] in
+                guard
+                    let self,
+                    let fullImageURL = self.fullImageURL
+                else { return }
+                view?.showFullImage(with: fullImageURL)
+            }
+        )
+        return model
     }
 }
