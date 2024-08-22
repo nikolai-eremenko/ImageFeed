@@ -7,7 +7,13 @@
 
 import Foundation
 
-final class DateConvertor {
+protocol DateConvertorProtocol {
+    static var shared: Self { get }
+    func getDateFromString(from string: String) -> Date?
+    func getStringFromDate(from date: Date) -> String
+}
+
+final class DateConvertor: DateConvertorProtocol{
     static let shared = DateConvertor()
     
     private init() { }

@@ -15,7 +15,7 @@ protocol ProfileViewPresenterProtocol {
 
 final class ProfileViewPresenter: ProfileViewPresenterProtocol {
     weak var view: ProfileViewControllerProtocol?
-    
+    var router: ProfileRouterProtocol?
     private let tokenStorage: OAuth2TokenStorageProtocol
     private let profileService: ProfileServiceProtocol
     private let profileImageService: ProfileImageServiceProtocol
@@ -24,12 +24,14 @@ final class ProfileViewPresenter: ProfileViewPresenterProtocol {
         view: ProfileViewControllerProtocol,
         tokenStorage: OAuth2TokenStorageProtocol,
         profileService: ProfileServiceProtocol,
-        profileImageService: ProfileImageServiceProtocol
+        profileImageService: ProfileImageServiceProtocol,
+        router: ProfileRouterProtocol
     ) {
         self.view = view
         self.tokenStorage = tokenStorage
         self.profileService = profileService
         self.profileImageService = profileImageService
+        self.router = router
     }
     
     func viewDidLoad() {

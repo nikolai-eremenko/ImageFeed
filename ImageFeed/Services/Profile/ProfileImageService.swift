@@ -9,7 +9,6 @@ import Foundation
 
 protocol ProfileImageServiceProtocol {
     static var shared: Self { get }
-//    static var didChangeNotification: Notification.Name { get }
     var avatarURL: String? { get set }
     func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void)
     func clearProfileImageURL()
@@ -17,7 +16,6 @@ protocol ProfileImageServiceProtocol {
 
 final class ProfileImageService: ProfileImageServiceProtocol {
     static let shared = ProfileImageService()
-//    static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
     
     private let storage = OAuth2TokenStorage.shared
     
@@ -54,12 +52,6 @@ final class ProfileImageService: ProfileImageServiceProtocol {
             case .success(let object):
                 let profileImageURL = object.profileImage.large
                 completion(.success(profileImageURL))
-                
-//                NotificationCenter.default.post(
-//                    name: ProfileImageService.didChangeNotification,
-//                    object: self,
-//                    userInfo: ["URL": profileImageURL]
-//                )
                 
                 self.avatarURL = profileImageURL
                 

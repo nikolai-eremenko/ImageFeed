@@ -8,9 +8,15 @@
 import UIKit
 import Kingfisher
 
-final class SingleImageViewController: UIViewController {
+protocol SingleImageViewControllerProtocol: AnyObject {
+    var presenter: SingleImageViewPresenterProtocol? { get set }
+    func showFullImage(with imageURL: URL)
+}
+
+final class SingleImageViewController: UIViewController, SingleImageViewControllerProtocol{
+    var presenter: SingleImageViewPresenterProtocol?
     
-    var fullImageURL: URL?
+//    var fullImageURL: URL?
     
     var image: UIImage? {
         didSet {
@@ -60,16 +66,12 @@ final class SingleImageViewController: UIViewController {
         setupUI()
         setupConstraints()
         
-        showFullImage()
+        presenter?.viewDidLoad()
     }
-}
-
-private extension SingleImageViewController {
     
-    func showFullImage() {
-        guard let fullImageURL = fullImageURL else { return }
+    func showFullImage(with imageURL: URL) {
         UIBlockingProgressHUD.show()
-        imageView.kf.setImage(with: fullImageURL) { [weak self] result in
+        imageView.kf.setImage(with: imageURL) { [weak self] result in
             UIBlockingProgressHUD.dismiss()
             
             guard let self = self else { return }
@@ -80,15 +82,13 @@ private extension SingleImageViewController {
                     self.rescaleAndCenterImageInScrollView(image: imageResult.image)
                 }
             case .failure(let error):
-                print("DEBUG",
-                      "[\(String(describing: self)).\(#function)]:",
-                      "Error while fetching full image: \(error.localizedDescription)",
-                      separator: "\n")
                 self.showError(vc: self)
             }
         }
     }
-    
+}
+
+private extension SingleImageViewController {
     // MARK: - Error Alert
     func showError(vc: SingleImageViewController) {
         let alertModel = AlertModel(
@@ -97,7 +97,7 @@ private extension SingleImageViewController {
             buttons: [.cancelButton, .retryButton],
             identifier: "SingleImageError",
             completion: {
-                self.showFullImage()
+//                self.showFullImage()
             }
         )
         AlertPresenter.showAlert(on: vc, model: alertModel)
@@ -126,7 +126,7 @@ private extension SingleImageViewController {
     // MARK: - Actions
     @objc
     func didTapBackButton() {
-        dismiss(animated: true, completion: nil)
+        presenter?.didTapBackButton()
     }
     
     @objc

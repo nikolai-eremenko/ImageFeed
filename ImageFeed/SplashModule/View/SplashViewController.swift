@@ -64,57 +64,6 @@ private extension SplashViewController {
         
         window.rootViewController = tabBarController
     }
-//    
-//    // MARK: - Fetching
-//    func fetchProfile(_ token: String) {
-//        profileService.fetchProfile(token) { [weak self] result in
-//            guard let self = self else { return }
-//            
-//            switch result {
-//            case .success(let profile):
-//                print("DEBUG",
-//                      "[\(String(describing: self)).\(#function)]:",
-//                      "Profile fetched",
-//                      "Username: \(profile.username)",
-//                      "Name: \(profile.name)",
-//                      "LoginName: \(profile.loginName)",
-//                      "Bio: \(profile.bio ?? "nil")",
-//                      separator: "\n")
-//                self.fetchProfileImageURL(username: profile.username)
-//            case .failure(let error):
-//                print("DEBUG",
-//                      "[\(String(describing: self)).\(#function)]:",
-//                      "ProfileService error -",
-//                      error.localizedDescription,
-//                      separator: "\n")
-//                break
-//            }
-//        }
-//    }
-    
-//    private func fetchProfileImageURL(username: String) {
-//        imageService.fetchProfileImageURL(username: username) { [weak self] result in
-//            guard let self = self else { return }
-//            
-//            switch result {
-//            case .success(let imageStringURL):
-//                print("DEBUG",
-//                      "[\(String(describing: self)).\(#function)]:",
-//                      "ProfileImageURL fetched",
-//                      "URL: \(imageStringURL)",
-//                      separator: "\n")
-//                self.switchToTabBarController()
-//                dismiss(animated: true)
-//            case .failure(let error):
-//                print("DEBUG",
-//                      "[\(String(describing: self)).\(#function)]:",
-//                      "ProfileImageService error -",
-//                      error.localizedDescription,
-//                      separator: "\n")
-//                break
-//            }
-//        }
-//    }
     
     // MARK: - Constraints
     func setupViews() {

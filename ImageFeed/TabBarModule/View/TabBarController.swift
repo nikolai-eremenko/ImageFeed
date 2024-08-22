@@ -29,14 +29,25 @@ final class TabBarController: UITabBarController {
     }
     
     private func setupTabs() {
-        let imagesListViewController = ImagesListViewController()
+        // Images
+        let imagesListNavigationController = UINavigationController()
+        let assemblyBuilder = AssemblyModuleBuilder()
+        
+        let imageListRouter = ImagesListRouter(navigationController: imagesListNavigationController, assemblyBuilder: assemblyBuilder)
+        imageListRouter.initialViewController()
+        let imagesListViewController = imagesListNavigationController
         imagesListViewController.tabBarItem = UITabBarItem(
             title: nil,
             image: UIImage(systemName: "rectangle.stack.fill"),
             selectedImage: nil
         )
         
-        let profileViewController = ModuleBuilder.createProfileModule()
+        
+        // Profile
+        let profileRouter = ProfileRouter(assemblyBuilder: assemblyBuilder)
+        profileRouter.initialViewController()
+        
+        let profileViewController = profileRouter.navigationController
         profileViewController.tabBarItem = UITabBarItem(
             title: nil,
             image: UIImage(systemName: "person.crop.circle.fill"),
