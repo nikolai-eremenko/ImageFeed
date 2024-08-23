@@ -19,6 +19,8 @@ final class ImagesListHelperSpy: ImagesListHelperProtocol {
     
     var photos = [Photo]()
     
+    
+    
     func getPhotosCount() -> Int {
         return photos.count
     }

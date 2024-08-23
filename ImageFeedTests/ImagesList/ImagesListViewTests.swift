@@ -9,45 +9,47 @@ import XCTest
 @testable import ImageFeed
 
 final class ImagesListViewTests: XCTestCase {
-    //given
-    var viewController: ImagesListViewController!
-    var presenter: ImagesListViewPresenterSpy!
     var imagesListService: ImagesListServiceStub!
     var dateFormatter: DateConvertorStub!
     var imagesHelper: ImagesListHelperSpy!
+    var photos: [Photo]!
+    
+    var tableView: UITableView!
+    private var dataSource: UITableViewDataSource!
+    private var delegate: UITableViewDelegate!
 
     override func setUpWithError() throws {
-        viewController = ImagesListViewController()
         imagesListService = ImagesListServiceStub()
         dateFormatter = DateConvertorStub.shared
         imagesHelper = ImagesListHelperSpy(imagesListService: imagesListService,
                                         dateFormatter: dateFormatter)
-        presenter = ImagesListViewPresenterSpy(view: viewController,
-                                            imagesHelper: imagesHelper)
-        viewController.presenter = presenter
+        
+        photos = (0...9).map { _ in
+            Photo(id: "Quux",
+                  size: CGSize(width: 100, height: 100),
+                  createdAt: Date(),
+                  welcomeDescription: "Quuux",
+                  fullImageURL: "Foo",
+                  largeImageURL: "Bar",
+                  smallImageURL: "Baz",
+                  thumbImageURL: "Quuuux",
+                  isLiked: false)
+        }
     }
 
     override func tearDownWithError() throws {
-        //then
-        viewController = nil
-        presenter = nil
         imagesListService = nil
         dateFormatter = nil
         imagesHelper = nil
+        photos = nil
     }
     
-    //viewController calls presenter methods
-//    func viewDidLoad() ++++++
-//    func fetchPhotosNextPage() ++++++
-//    func didTapLikeButton(cell: ImagesListCell, indexPath: IndexPath)
-//    func didSelectImage(indexPath: IndexPath)
-//    func getPhoto(indexPath: IndexPath) -> Photo?
-//    func getPhotosCount() -> Int
-//    func getStringFromDate(from date: Date) -> String
-//    func updateTableViewAnimated()
-    
     func testViewControllerCallsPresentersViewDidLoad() {
-        //given in setUpWithError()
+        //given
+        let viewController = ImagesListViewController()
+        let presenter = ImagesListViewPresenterSpy(view: viewController,
+                                                   imagesHelper: imagesHelper)
+        viewController.presenter = presenter
         
         //when
         viewController.loadViewIfNeeded()
@@ -57,7 +59,11 @@ final class ImagesListViewTests: XCTestCase {
     }
     
     func testViewControllerCallsPresentersFetchPhotosNextPage() {
-        //given in setUpWithError()
+        //given
+        let viewController = ImagesListViewController()
+        let presenter = ImagesListViewPresenterSpy(view: viewController,
+                                                   imagesHelper: imagesHelper)
+        viewController.presenter = presenter
         
         //when
         viewController.loadViewIfNeeded()
@@ -66,98 +72,33 @@ final class ImagesListViewTests: XCTestCase {
         XCTAssertTrue(presenter.isFetchPhotosNextPageCalled)
     }
     
-//    func testViewControllerCallsPresentersDidSelectImage() {
-//        //given in setUpWithError()
-//        let tableView = UITableView()
-//        
-//        //when
-////        viewController.loadViewIfNeeded()
-//        viewController.tableView(tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
-//        
-//        //then
-//        XCTAssertTrue(presenter.isGetPhotoCalled)
-//    }
+    func testViewControllerCallsPresentersGetPhoto() {
+        // given
+        let viewController = ImagesListViewController()
+        let presenter = ImagesListViewPresenterSpy(view: viewController, imagesHelper: imagesHelper)
+        viewController.presenter = presenter
+        
+        // when
+        viewController.loadViewIfNeeded()
+        viewController.configCell(for: ImagesListCell(), with: IndexPath(row: 2, section: 0))
+        
+        //then
+        XCTAssertTrue(presenter.isGetPhotoCalled)
+    }
     
-//    func testViewControllerCallsPresentersDidTapLikeButton() {
-//        //given in setUpWithError()
-//        let photosStub = (0...9).map { _ in
-//            Photo(id: "Quux",
-//                  size: CGSize(width: 100, height: 100),
-//                  createdAt: Date(),
-//                  welcomeDescription: "Quuux",
-//                  fullImageURL: "Foo",
-//                  largeImageURL: "Bar",
-//                  smallImageURL: "Baz",
-//                  thumbImageURL: "Quuuux",
-//                  isLiked: false)
-//        }
-//        imagesHelper.photos.append(contentsOf: photosStub)
-//        
-//        let tableView = UITableView()
-//        
-//        
-//        //when
-//        viewController.loadViewIfNeeded()
-//        viewController.imageListCellDidTapLike(UITableViewCell())
-//        
-//        //then
-//        XCTAssertTrue(presenter.isDidTapLikeButtonCalled)
-//    }
-    
-
-//    func testViewControllerCalssFetchPhotosNextPage() {
-//        //given
-//        let viewController = ImagesListViewController()
-//        viewController.presenter = presenter
-//        presenter.view = viewController
-//        
-//        //when
-//        presenter.viewDidLoad()
-//        presenter.fetchPhotosNextPage()
-//        
-//        //then
-//        XCTAssertTrue(viewController.fetchPhotosNextPageCalled)
-//    }
-    
-//    func testPresenterCallsShowSingleImage() {
-//        //given
-//        let viewController = ImagesListViewControllerSpy()
-//        viewController.presenter = presenter
-//        presenter.view = viewController
-//        
-//        //when
-//        presenter.viewDidLoad()
-//        presenter.didSelectImage(indexPath: IndexPath(row: 2, section: 0))
-//        
-//        //then
-//        XCTAssertTrue(viewController.showSingleImageCalled)
-//    }
-    
-//    func testPresenterCallsImageListCellDidTapLike() {
-//        //given
-//        let viewController = ImagesListViewControllerSpy()
-//        viewController.presenter = presenter
-//        presenter.view = viewController
-//        
-//        //when
-//        presenter.viewDidLoad()
-//        presenter?.didTapLikeButton(cell: ImagesListCell(), indexPath: IndexPath(row: 2, section: 0))
-//        
-//        //then
-//        XCTAssertTrue(viewController.imageListCellDidTapLikeCalled)
-//    }
-    
-//    func testPresenterCallsTableViewInsertRows() {
-//        //given
-//        let viewController = ImagesListViewControllerSpy()
-//        viewController.presenter = presenter
-//        presenter.view = viewController
-//        
-//        //when
-//        presenter.viewDidLoad()
-//        
-//        //then
-//        XCTAssertTrue(viewController.tableViewInsertRowsCalled)
-//    }
+    func testPresenterCallViewShowSingleImage() {
+        //given
+        let viewController = ImagesListViewControllerSpy()
+        let presenter = ImagesListViewPresenter(view: viewController, imagesHelper: imagesHelper)
+        viewController.presenter = presenter
+        presenter.view = viewController
+        imagesHelper.photos.append(contentsOf: photos)
+        
+        //when
+        presenter.didSelectImage(indexPath: IndexPath(row: 2, section: 0))
+        
+        //then
+        XCTAssertTrue(viewController.isShowSingleImageCalled)
+    }
 
 }

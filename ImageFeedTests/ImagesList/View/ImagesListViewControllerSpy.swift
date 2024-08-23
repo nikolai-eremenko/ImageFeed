@@ -12,6 +12,8 @@ import Kingfisher
 final class ImagesListViewControllerSpy: UIViewController, ImagesListViewControllerProtocol {
     var presenter: ImagesListViewPresenterProtocol?
     
+    var isShowSingleImageCalled = false
+    
 //    var isTableViewInsertRowsCalled = false
     
     //MARK: - UI Components
@@ -93,7 +95,8 @@ final class ImagesListViewControllerSpy: UIViewController, ImagesListViewControl
     }
     
     func showSingleImage(vc: UIViewController) {
-        present(vc, animated: true)
+        isShowSingleImageCalled = true
+//        present(vc, animated: true)
     }
     
     // MARK: - Alerts
