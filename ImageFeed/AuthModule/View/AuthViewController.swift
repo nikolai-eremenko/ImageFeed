@@ -26,6 +26,7 @@ final class AuthViewController: UIViewController {
         view.setTitleColor(.ypBlack, for: .normal)
         view.setTitle("Войти", for: .normal)
         view.addTarget(self, action: #selector(switchToWebViewController), for: .touchUpInside)
+        view.accessibilityIdentifier = "Authenticate"
         return view
     }()
     

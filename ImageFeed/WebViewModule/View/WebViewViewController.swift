@@ -33,6 +33,7 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
         let configuration = WKWebViewConfiguration()
         let view = WKWebView(frame: .zero, configuration: configuration)
         view.navigationDelegate = self
+        view.accessibilityIdentifier = "UnsplashWebView"
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()

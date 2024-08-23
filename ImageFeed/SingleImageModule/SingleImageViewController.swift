@@ -46,6 +46,7 @@ final class SingleImageViewController: UIViewController, SingleImageViewControll
         let view = UIButton(type: .custom)
         view.setImage(UIImage(named: "ic.backward"), for: [])
         view.tintColor = .ypWhite
+        view.accessibilityIdentifier = "BackButton"
         view.addTarget(self, action: #selector(didTapBackButton), for: .touchUpInside)
         return view
     }()

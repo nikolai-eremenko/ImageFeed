@@ -43,6 +43,7 @@ final class ImagesListCell: UITableViewCell {
         let view = UIButton(type: .custom)
         view.setImage(UIImage(named: "ic.like"), for: .normal)
         view.tintColor = .ypWhiteAlpha50
+        view.accessibilityIdentifier = "likeButtonIsNotLiked"
         view.addTarget(self, action: #selector(likeButtonClicked), for: .touchUpInside)
         return view
     }()
@@ -79,10 +80,12 @@ final class ImagesListCell: UITableViewCell {
         cellImageView.image = image
         dateLabel.text = date
         likeButton.tintColor = isLiked ? .ypRed : .ypWhiteAlpha50
+        likeButton.accessibilityIdentifier = isLiked ? "likeButtonIsLiked" : "likeButtonIsNotLiked"
     }
     
     func setIsLiked(_ isLiked: Bool) {
-        self.likeButton.tintColor = isLiked ? .ypRed : .ypWhiteAlpha50
+        likeButton.tintColor = isLiked ? .ypRed : .ypWhiteAlpha50
+        likeButton.accessibilityIdentifier = isLiked ? "likeButtonIsLiked" : "likeButtonIsNotLiked"
     }
 }
 
