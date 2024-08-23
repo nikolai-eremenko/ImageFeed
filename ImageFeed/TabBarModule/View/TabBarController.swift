@@ -32,9 +32,10 @@ final class TabBarController: UITabBarController {
         let imagesListViewController = ImagesListViewController()
         let imagesListService = ImagesListService()
         let dateFormatter = DateConvertor.shared
+        let imagesHelper = ImagesListHelper(imagesListService: imagesListService,
+                                            dateFormatter: dateFormatter)
         let imagesListViewPresenter = ImagesListViewPresenter(view: imagesListViewController,
-                                                              imagesListService: imagesListService,
-                                                              dateFormatter: dateFormatter)
+                                                              imagesHelper: imagesHelper)
         imagesListViewController.presenter = imagesListViewPresenter
         imagesListViewPresenter.view = imagesListViewController
         imagesListViewController.tabBarItem = UITabBarItem(

@@ -9,29 +9,25 @@ import XCTest
 @testable import ImageFeed
 
 final class ProfileViewTests: XCTestCase {
-    
     var viewController: ProfileViewControllerProtocol!
     var presenter: ProfileViewPresenterProtocol!
     var tokenStorage: OAuth2TokenStorageProtocol!
     var profileService: ProfileServiceProtocol!
     var profileImageService: ProfileImageServiceProtocol!
     
-    override func setUp() {
-        super.setUp()
+    override func setUpWithError() throws {
         //given
         viewController = ProfileViewController()
         tokenStorage = OAuth2TokenStorageStub.shared
         profileService = ProfileServiceStub.shared
         profileImageService = ProfileImageServiceStub.shared
-        
         presenter = ProfileViewPresenter(view: viewController,
                                          tokenStorage: tokenStorage,
                                          profileService: profileService,
                                          profileImageService: profileImageService)
     }
     
-    override func tearDown() {
-        super.tearDown()
+    override func tearDownWithError() throws {
         viewController = nil
         presenter = nil
         tokenStorage = nil

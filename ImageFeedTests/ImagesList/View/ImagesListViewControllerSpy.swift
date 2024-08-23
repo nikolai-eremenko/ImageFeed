@@ -1,23 +1,18 @@
 //
-//  ImagesListViewController.swift
-//  ImageFeed
+//  ImagesListViewControllerSpy.swift
+//  ImageFeedTests
 //
-//  Created by Nikolai Eremenko on 02.06.2024.
+//  Created by Nikolai Eremenko on 22.08.2024.
 //
 
 import UIKit
 import Kingfisher
+@testable import ImageFeed
 
-protocol ImagesListViewControllerProtocol: AnyObject, ImagesListCellDelegate {
-    var presenter: ImagesListViewPresenterProtocol? { get set }
-    func showLikeErrorAlert(model: AlertModel)
-    func showSingleImage(vc: UIViewController)
-    func tableViewInsertRows(at indexPaths: [IndexPath])
-    func configCell(for cell: ImagesListCell, with indexPath: IndexPath)
-}
-
-final class ImagesListViewController: UIViewController, ImagesListViewControllerProtocol {
+final class ImagesListViewControllerSpy: UIViewController, ImagesListViewControllerProtocol {
     var presenter: ImagesListViewPresenterProtocol?
+    
+//    var isTableViewInsertRowsCalled = false
     
     //MARK: - UI Components
     private lazy var tableView: UITableView = {
@@ -30,15 +25,16 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
         return view
     }()
     
-    //MARK: - Lifecycle
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        overrideUserInterfaceStyle = .dark
-        
-        setupUI()
-        setupConstraints()
-        presenter?.viewDidLoad()
-    }
+//    //MARK: - Lifecycle
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//        
+//        overrideUserInterfaceStyle = .dark
+//        
+//        setupUI()
+//        setupConstraints()
+//        presenter?.viewDidLoad()
+//    }
     
     // MARK: - Cell
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
@@ -90,9 +86,10 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
     }
     
     func tableViewInsertRows(at indexPaths: [IndexPath]) {
-        tableView.performBatchUpdates {
-            tableView.insertRows(at: indexPaths, with: .automatic)
-        } completion: { _ in }
+//        isTableViewInsertRowsCalled = true
+//        tableView.performBatchUpdates {
+//            tableView.insertRows(at: indexPaths, with: .automatic)
+//        } completion: { _ in }
     }
     
     func showSingleImage(vc: UIViewController) {
@@ -123,7 +120,7 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
 }
 
 // MARK: - UITableViewDelegate
-extension ImagesListViewController: UITableViewDelegate {
+extension ImagesListViewControllerSpy: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         guard let photo = presenter?.getPhoto(indexPath: indexPath) else { return 200 }
 
@@ -148,32 +145,8 @@ extension ImagesListViewController: UITableViewDelegate {
 }
 
 // MARK: - ImagesListCellDelegate
-extension ImagesListViewController: ImagesListCellDelegate {
+extension ImagesListViewControllerSpy: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
-        guard let indexPath = tableView.indexPath(for: cell) else { return }
         
-        presenter?.didTapLikeButton(indexPath: indexPath) { [weak self] result in
-            guard let self else { return }
-            
-            switch result {
-            case .success(let isLiked):
-                cell.setIsLiked(isLiked)
-            case .failure(let error):
-                guard let model = self.presenter?.getLikeErrorAlert() else { return }
-                self.showLikeErrorAlert(model: model)
-                
-                print("DEBUG",
-                      "[\(String(describing: self)).\(#function)]:",
-                      "Like error -",
-                      error.localizedDescription,
-                      separator: "\n")
-            }
-        }
     }
-}
-
-// MARK: - Preview
-@available(iOS 17, *)
-#Preview() {
-    ImagesListViewController()
 }

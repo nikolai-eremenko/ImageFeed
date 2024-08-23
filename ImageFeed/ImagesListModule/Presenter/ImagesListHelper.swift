@@ -1,0 +1,94 @@
+//
+//  ImagesListHelper.swift
+//  ImageFeed
+//
+//  Created by Nikolai Eremenko on 22.08.2024.
+//
+
+import Foundation
+
+protocol ImagesListHelperProtocol {
+    func fetchPhotosNextPage()
+    func getPhotosCount() -> Int
+    func getPhoto(indexPath: IndexPath) -> Photo?
+    func getInsertIndexPaths() -> [IndexPath]?
+    func changeLike(indexPath: IndexPath, _ completion: @escaping (Result<Bool, Error>) -> Void)
+    func getImageStringURL(indexPath: IndexPath) -> String?
+    func getStringFromDate(from date: Date) -> String
+}
+
+final class ImagesListHelper: ImagesListHelperProtocol {
+    private let imagesListService: ImagesListServiceProtocol
+    private let dateFormatter: DateConvertorProtocol
+    
+    private var photos = [Photo]()
+    
+    init(imagesListService: ImagesListServiceProtocol, dateFormatter: DateConvertorProtocol) {
+        self.imagesListService = imagesListService
+        self.dateFormatter = dateFormatter
+    }
+    
+    func fetchPhotosNextPage() {
+        imagesListService.fetchPhotosNextPage()
+    }
+    
+    func getPhotosCount() -> Int {
+        return photos.count
+    }
+    
+    func getPhoto(indexPath: IndexPath) -> Photo? {
+        return photos[safeIndex: indexPath.row]
+    }
+    
+    
+    // MARK: - Insert rows
+    func getInsertIndexPaths() -> [IndexPath]? {
+        let oldCount = photos.count
+        let newCount = imagesListService.photos.count
+        guard oldCount != newCount else { return nil }
+        
+        photos = imagesListService.photos
+        
+        let indexPaths = (oldCount..<newCount).map { i in
+            IndexPath(row: i, section: 0)
+        }
+        return indexPaths
+    }
+    
+    // MARK: - Like
+    func changeLike(indexPath: IndexPath, _ completion: @escaping (Result<Bool, Error>) -> Void)  {
+        let photo = photos[indexPath.row]
+        
+        UIBlockingProgressHUD.show()
+        
+        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
+            guard let self else { return }
+            
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    self.photos = self.imagesListService.photos
+                    let isLiked = self.photos[indexPath.row].isLiked
+                    completion(.success(isLiked))
+                }
+                UIBlockingProgressHUD.dismiss()
+            case .failure(let error):
+                UIBlockingProgressHUD.dismiss()
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+    
+    func getImageStringURL(indexPath: IndexPath) -> String? {
+        guard let photo = photos[safeIndex: indexPath.row] else { return nil }
+        return photo.fullImageURL
+    }
+    
+    func getStringFromDate(from date: Date) -> String {
+        return dateFormatter.getStringFromDate(from: date)
+    }
+    
+    
+}

@@ -42,4 +42,16 @@ struct Photo {
         self.thumbImageURL = photo.thumbImageURL
         self.isLiked = isLiked
     }
+    
+    init(id: String, size: CGSize, createdAt: Date?, welcomeDescription: String?, fullImageURL: String, largeImageURL: String, smallImageURL: String, thumbImageURL: String, isLiked: Bool) {
+        self.id = id
+        self.size = size
+        self.createdAt = createdAt
+        self.welcomeDescription = welcomeDescription
+        self.fullImageURL = fullImageURL
+        self.largeImageURL = largeImageURL
+        self.smallImageURL = smallImageURL
+        self.thumbImageURL = thumbImageURL
+        self.isLiked = isLiked
+    }
 }

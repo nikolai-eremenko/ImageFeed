@@ -29,12 +29,7 @@ final class ImagesListService: ImagesListServiceProtocol {
     func fetchPhotosNextPage() {
         assert(Thread.isMainThread)
         
-        guard
-            let token = tokenStorage.token,
-            fetchPhotosTask == nil
-        else {
-            return
-        }
+        guard let token = tokenStorage.token, fetchPhotosTask == nil else { return }
         
         let nextPage = lastLoadedPage + 1
         
