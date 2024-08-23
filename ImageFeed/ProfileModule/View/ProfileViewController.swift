@@ -42,7 +42,7 @@ final class ProfileViewController: UIViewController {
     
     private lazy var profilePhotoImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "img.photo")
+        imageView.image = UIImage(named: "ic.person.crop.circle.fill")
         imageView.tintColor = .ypGray
         imageView.backgroundColor = .ypWhite
         imageView.layer.cornerRadius = 35
@@ -65,7 +65,7 @@ final class ProfileViewController: UIViewController {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 23, weight: .bold)
         label.textColor = UIColor(named: "YPWhite")
-        label.text = "Екатерина Новикова"
+        label.text = ""
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -74,7 +74,7 @@ final class ProfileViewController: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
         label.textColor = UIColor(named: "YPGray")
-        label.text = "@ekaterina_nov"
+        label.text = ""
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -83,7 +83,7 @@ final class ProfileViewController: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
         label.textColor = UIColor(named: "YPWhite")
-        label.text = "Hello, world!"
+        label.text = ""
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

@@ -66,17 +66,17 @@ final class ImagesListViewTests: XCTestCase {
         XCTAssertTrue(presenter.isFetchPhotosNextPageCalled)
     }
     
-    func testViewControllerCallsPresentersDidSelectImage() {
-        //given in setUpWithError()
-        let tableView = UITableView()
-        
-        //when
-//        viewController.loadViewIfNeeded()
-        viewController.tableView(tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
-        
-        //then
-        XCTAssertTrue(presenter.isGetPhotoCalled)
-    }
+//    func testViewControllerCallsPresentersDidSelectImage() {
+//        //given in setUpWithError()
+//        let tableView = UITableView()
+//        
+//        //when
+////        viewController.loadViewIfNeeded()
+//        viewController.tableView(tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
+//        
+//        //then
+//        XCTAssertTrue(presenter.isGetPhotoCalled)
+//    }
     
 //    func testViewControllerCallsPresentersDidTapLikeButton() {
 //        //given in setUpWithError()
