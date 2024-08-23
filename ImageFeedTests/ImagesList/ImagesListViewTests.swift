@@ -100,5 +100,22 @@ final class ImagesListViewTests: XCTestCase {
         //then
         XCTAssertTrue(viewController.isShowSingleImageCalled)
     }
+    
+    func testPresenterReturnsIndexPathsForTableViewInsertRows () {
+        //given
+        let viewController = ImagesListViewControllerSpy()
+        let presenter = ImagesListViewPresenter(view: viewController, imagesHelper: imagesHelper)
+        viewController.presenter = presenter
+        presenter.view = viewController
+        imagesHelper.photos.append(contentsOf: photos)
+        imagesListService.photos.append(contentsOf: photos)
+        imagesListService.photos.append(contentsOf: photos)
+        
+        //when
+        presenter.updateTableViewAnimated()
+        
+        //then
+        XCTAssertEqual(viewController.receivedIndexPaths.count, photos.count)
+    }
 
 }

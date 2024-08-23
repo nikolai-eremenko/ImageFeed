@@ -13,6 +13,8 @@ final class ImagesListViewControllerSpy: UIViewController, ImagesListViewControl
     var presenter: ImagesListViewPresenterProtocol?
     
     var isShowSingleImageCalled = false
+//    var isTableViewInsertRowsCalled = false
+    var receivedIndexPaths = [IndexPath]()
     
 //    var isTableViewInsertRowsCalled = false
     
@@ -26,17 +28,6 @@ final class ImagesListViewControllerSpy: UIViewController, ImagesListViewControl
         view.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
         return view
     }()
-    
-//    //MARK: - Lifecycle
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        
-//        overrideUserInterfaceStyle = .dark
-//        
-//        setupUI()
-//        setupConstraints()
-//        presenter?.viewDidLoad()
-//    }
     
     // MARK: - Cell
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
@@ -88,10 +79,8 @@ final class ImagesListViewControllerSpy: UIViewController, ImagesListViewControl
     }
     
     func tableViewInsertRows(at indexPaths: [IndexPath]) {
+        receivedIndexPaths = indexPaths
 //        isTableViewInsertRowsCalled = true
-//        tableView.performBatchUpdates {
-//            tableView.insertRows(at: indexPaths, with: .automatic)
-//        } completion: { _ in }
     }
     
     func showSingleImage(vc: UIViewController) {
