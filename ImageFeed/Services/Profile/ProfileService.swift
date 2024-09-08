@@ -12,7 +12,7 @@ import Kingfisher
 protocol ProfileServiceProtocol {
     static var shared: Self { get }
     var profile: Profile? { get set}
-    func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void)
+    func fetchProfile(request: URLRequest?, completion: @escaping (Result<Profile, Error>) -> Void)
     func logout(_ vc: ProfileViewControllerProtocol)
 }
 
@@ -23,20 +23,16 @@ final class ProfileService: ProfileServiceProtocol {
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     var profile: Profile?
-    private let imagesListService = ImagesListService()
-    private let cache = ImageCache.default
     
     // MARK: - Init
     private init() { }
     
     // MARK: - Public methods
-    func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
+    func fetchProfile(request: URLRequest?, completion: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread)
         task?.cancel()
         
-        guard
-            let request = Endpoint.getProfile(token: token).request
-        else {
+        guard let request else {
             completion(.failure(NetworkError.invalidRequest))
             fatalError("cannot create URL")
         }
@@ -101,10 +97,10 @@ private extension ProfileService {
     
     func cleanUserData() {
         ProfileImageService.shared.clearProfileImageURL()
-        imagesListService.cleanImagesList()
+        ImagesListService.shared.clearPhotosURL()
         OAuth2TokenStorage.shared.removeTokenKey()
-        cache.clearMemoryCache()
-        cache.clearDiskCache()
+        ImageCache.default.clearMemoryCache()
+        ImageCache.default.clearDiskCache()
     }
     
     func switchToSplashScreen() {

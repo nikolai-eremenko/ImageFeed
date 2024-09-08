@@ -22,8 +22,9 @@
 		911018C72C70979E004F9E6C /* WebViewPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018C62C70979E004F9E6C /* WebViewPresenter.swift */; };
 		911018C92C70AD5C004F9E6C /* AuthHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018C82C70AD5C004F9E6C /* AuthHelper.swift */; };
 		911018CB2C70B530004F9E6C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018CA2C70B530004F9E6C /* Constants.swift */; };
-		911018CF2C70B847004F9E6C /* AuthConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018CE2C70B847004F9E6C /* AuthConfiguration.swift */; };
+		911018CF2C70B847004F9E6C /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018CE2C70B847004F9E6C /* Configuration.swift */; };
 		911018E52C71B70B004F9E6C /* ProfileViewPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911018E42C71B70B004F9E6C /* ProfileViewPresenter.swift */; };
+		9117489B2C8A059F00564289 /* ProfileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9117489A2C8A059F00564289 /* ProfileHelper.swift */; };
 		9117F00B2C1AB16F0004D035 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9117F00A2C1AB16F0004D035 /* ProfileViewController.swift */; };
 		9119F88F2C7663320090DFDA /* ImagesListViewPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9119F88E2C7663320090DFDA /* ImagesListViewPresenter.swift */; };
 		9131B9822C2E83BD00C8F344 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9131B9812C2E83BD00C8F344 /* AuthViewController.swift */; };
@@ -94,9 +95,10 @@
 		911018C62C70979E004F9E6C /* WebViewPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewPresenter.swift; sourceTree = "<group>"; };
 		911018C82C70AD5C004F9E6C /* AuthHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthHelper.swift; sourceTree = "<group>"; };
 		911018CA2C70B530004F9E6C /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		911018CE2C70B847004F9E6C /* AuthConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthConfiguration.swift; sourceTree = "<group>"; };
+		911018CE2C70B847004F9E6C /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		911018D42C70DFB8004F9E6C /* ImageFeedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImageFeedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		911018E42C71B70B004F9E6C /* ProfileViewPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewPresenter.swift; sourceTree = "<group>"; };
+		9117489A2C8A059F00564289 /* ProfileHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileHelper.swift; sourceTree = "<group>"; };
 		9117F00A2C1AB16F0004D035 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		9119F88E2C7663320090DFDA /* ImagesListViewPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListViewPresenter.swift; sourceTree = "<group>"; };
 		9131B9812C2E83BD00C8F344 /* AuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
@@ -312,6 +314,7 @@
 			isa = PBXGroup;
 			children = (
 				911018E42C71B70B004F9E6C /* ProfileViewPresenter.swift */,
+				9117489A2C8A059F00564289 /* ProfileHelper.swift */,
 			);
 			path = Presenter;
 			sourceTree = "<group>";
@@ -446,7 +449,7 @@
 				91DAF7652C5A581500F88ECE /* URLSession+object.swift */,
 				91E7F0512C3E640100D9515B /* HTTP.swift */,
 				91E7F0532C3E642D00D9515B /* Endpoint.swift */,
-				911018CE2C70B847004F9E6C /* AuthConfiguration.swift */,
+				911018CE2C70B847004F9E6C /* Configuration.swift */,
 				911018CA2C70B530004F9E6C /* Constants.swift */,
 			);
 			path = Network;
@@ -611,7 +614,7 @@
 				9131B9842C2E8D9900C8F344 /* WebViewViewController.swift in Sources */,
 				91DAF7752C5BA52100F88ECE /* TabBarController.swift in Sources */,
 				910086CD2C64C9D100E63834 /* ImageCellModel.swift in Sources */,
-				911018CF2C70B847004F9E6C /* AuthConfiguration.swift in Sources */,
+				911018CF2C70B847004F9E6C /* Configuration.swift in Sources */,
 				911018BB2C6C8260004F9E6C /* Array+Extensions.swift in Sources */,
 				917ACF3D2C4A352800434CE7 /* Profile.swift in Sources */,
 				91DAF76B2C5A8ED200F88ECE /* AlertModel.swift in Sources */,
@@ -650,6 +653,7 @@
 				911018C92C70AD5C004F9E6C /* AuthHelper.swift in Sources */,
 				919AE5AE2C65E45400109333 /* UrlsResult.swift in Sources */,
 				91F9A8802C4A307D003E2B3A /* ProfileService.swift in Sources */,
+				9117489B2C8A059F00564289 /* ProfileHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -893,10 +897,13 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UZVJKNB3WY;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ru.nikolaidev.ImageFeed.ImageFeedTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -912,10 +919,13 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UZVJKNB3WY;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ru.nikolaidev.ImageFeed.ImageFeedTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -930,10 +940,13 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UZVJKNB3WY;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ru.nikolaidev.ImageFeed.ImageFeedUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -948,10 +961,13 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UZVJKNB3WY;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = ru.nikolaidev.ImageFeed.ImageFeedUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

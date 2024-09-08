@@ -27,11 +27,15 @@ enum Endpoint {
         return request
     }
     
+    private var configuration: Configuration {
+        return Configuration.standard
+    }
+    
     private var url: URL? {
         var components = URLComponents()
-        components.scheme = Constants.scheme
+        components.scheme = configuration.scheme
         components.host = self.host
-        components.port = Constants.port
+        components.port = configuration.port
         components.path = self.path
         components.queryItems = self.queryItems
         return components.url
@@ -40,9 +44,9 @@ enum Endpoint {
     private var host: String {
         switch self {
         case .authorize, .sendCode:
-            return Constants.host
+            return configuration.host
         case .getProfile, .getProfileImage, .getImages, .changeLike:
-            return Constants.api + "." + Constants.host
+            return configuration.api + "." + configuration.host
         }
     }
     
@@ -67,16 +71,16 @@ enum Endpoint {
         switch self {
         case .authorize:
             return [
-                URLQueryItem(name: "client_id", value: Constants.accessKey),
-                URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
+                URLQueryItem(name: "client_id", value: configuration.accessKey),
+                URLQueryItem(name: "redirect_uri", value: configuration.redirectURI),
                 URLQueryItem(name: "response_type", value: "code"),
-                URLQueryItem(name: "scope", value: Constants.accessScope)
+                URLQueryItem(name: "scope", value: configuration.accessScope)
             ]
         case .sendCode(_, let code):
             return [
-                URLQueryItem(name: "client_id", value: Constants.accessKey),
-                URLQueryItem(name: "client_secret", value: Constants.secretKey),
-                URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
+                URLQueryItem(name: "client_id", value: configuration.accessKey),
+                URLQueryItem(name: "client_secret", value: configuration.secretKey),
+                URLQueryItem(name: "redirect_uri", value: configuration.redirectURI),
                 URLQueryItem(name: "code", value: code),
                 URLQueryItem(name: "grant_type", value: "authorization_code")
             ]

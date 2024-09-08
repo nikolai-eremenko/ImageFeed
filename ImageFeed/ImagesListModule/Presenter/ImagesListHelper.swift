@@ -8,6 +8,7 @@
 import Foundation
 
 protocol ImagesListHelperProtocol {
+    
     func fetchPhotosNextPage()
     func getPhotosCount() -> Int
     func getPhoto(indexPath: IndexPath) -> Photo?
@@ -23,45 +24,51 @@ final class ImagesListHelper: ImagesListHelperProtocol {
     
     private var photos = [Photo]()
     
-    init(imagesListService: ImagesListServiceProtocol, dateFormatter: DateConvertorProtocol) {
+    private var lastLoadedPage: Int = 0
+    private var nextPage: Int = 0
+    private let perPage: Int = 10
+    
+    
+    private var tokenStorage: OAuth2TokenStorageProtocol
+    
+    init(imagesListService: ImagesListServiceProtocol,
+         dateFormatter: DateConvertorProtocol,
+         tokenStorage: OAuth2TokenStorageProtocol) {
         self.imagesListService = imagesListService
         self.dateFormatter = dateFormatter
+        self.tokenStorage = tokenStorage
     }
     
-    func fetchPhotosNextPage() {
-        imagesListService.fetchPhotosNextPage()
-    }
-    
-    func getPhotosCount() -> Int {
-        return photos.count
-    }
-    
-    func getPhoto(indexPath: IndexPath) -> Photo? {
-        return photos[safeIndex: indexPath.row]
-    }
-    
-    
-    // MARK: - Insert rows
-    func getInsertIndexPaths() -> [IndexPath]? {
-        let oldCount = photos.count
-        let newCount = imagesListService.photos.count
-        guard oldCount != newCount else { return nil }
+    private func imagesListRequest() -> URLRequest?  {
+        guard let token = tokenStorage.token else { return nil }
         
-        photos = imagesListService.photos
+        nextPage = lastLoadedPage + 1
         
-        let indexPaths = (oldCount..<newCount).map { i in
-            IndexPath(row: i, section: 0)
+        guard let request = Endpoint.getImages(token: token, page: nextPage, perPage: perPage).request else {
+            return nil
         }
-        return indexPaths
+        
+        return request
+    }
+    
+    private func changeLikesRequest(photo: Photo) -> URLRequest? {
+        guard
+            let token = tokenStorage.token,
+            let request = Endpoint.changeLike(photoId: photo.id, isLike: photo.isLiked, token: token).request
+        else {
+            return nil
+        }
+        
+        return request
     }
     
     // MARK: - Like
     func changeLike(indexPath: IndexPath, _ completion: @escaping (Result<Bool, Error>) -> Void)  {
         let photo = photos[indexPath.row]
-        
+        let request = changeLikesRequest(photo: photo)
         UIBlockingProgressHUD.show()
         
-        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
+        imagesListService.changeLike(request: request, photoId: photo.id) { [weak self] result in
             guard let self else { return }
             
             switch result {
@@ -80,6 +87,45 @@ final class ImagesListHelper: ImagesListHelperProtocol {
             }
         }
     }
+
+    func fetchPhotosNextPage() {
+        imagesListService.fetchPhotosNextPage(request: imagesListRequest()) { [weak self] result in
+            guard let self else { return }
+                
+            switch result {
+            case .success:
+                self.lastLoadedPage = self.nextPage
+            case .failure(let error):
+                print("DEBUG",
+                      "[\(String(describing: self)).\(#function)]:",
+                      "Error while fetching images:",
+                      error.localizedDescription,
+                      separator: "\n")
+            }
+        }
+    }
+    
+    func getPhotosCount() -> Int {
+        return photos.count
+    }
+    
+    func getPhoto(indexPath: IndexPath) -> Photo? {
+        return photos[safeIndex: indexPath.row]
+    }
+    
+    // MARK: - Insert rows
+    func getInsertIndexPaths() -> [IndexPath]? {
+        let oldCount = photos.count
+        let newCount = imagesListService.photos.count
+        guard oldCount != newCount else { return nil }
+        
+        photos = imagesListService.photos
+        
+        let indexPaths = (oldCount..<newCount).map { i in
+            IndexPath(row: i, section: 0)
+        }
+        return indexPaths
+    }
     
     func getImageStringURL(indexPath: IndexPath) -> String? {
         guard let photo = photos[safeIndex: indexPath.row] else { return nil }
@@ -89,6 +135,4 @@ final class ImagesListHelper: ImagesListHelperProtocol {
     func getStringFromDate(from date: Date) -> String {
         return dateFormatter.getStringFromDate(from: date)
     }
-    
-    
 }

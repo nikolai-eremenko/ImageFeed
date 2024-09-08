@@ -14,18 +14,11 @@ protocol AuthHelperProtocol {
 
 final class AuthHelper: AuthHelperProtocol {
     
-    let configuration: AuthConfiguration
-
-    init(configuration: AuthConfiguration = .standard) {
-        self.configuration = configuration
-    }
-    
     func authRequest() -> URLRequest? {
-        guard let request = configuration.authEndpoint.request else {
-            print("ERROR: cannot create URL")
+        guard let request = Endpoint.authorize().request else {
             return nil
         }
-        
+
         return request
     }
     

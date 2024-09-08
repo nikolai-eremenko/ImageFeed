@@ -164,7 +164,7 @@ extension ImagesListViewController: ImagesListCellDelegate {
                 
                 print("DEBUG",
                       "[\(String(describing: self)).\(#function)]:",
-                      "Like error -",
+                      "Like error:",
                       error.localizedDescription,
                       separator: "\n")
             }

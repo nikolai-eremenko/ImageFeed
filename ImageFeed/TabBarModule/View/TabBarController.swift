@@ -29,36 +29,37 @@ final class TabBarController: UITabBarController {
     }
     
     private func setupTabs() {
+        // MARK: - ImagesList Tab
         let imagesListViewController = ImagesListViewController()
-        let imagesListService = ImagesListService()
+        let imagesListService = ImagesListService.shared
         let dateFormatter = DateConvertor.shared
         let imagesHelper = ImagesListHelper(imagesListService: imagesListService,
-                                            dateFormatter: dateFormatter)
+                                            dateFormatter: dateFormatter,
+                                            tokenStorage: OAuth2TokenStorage.shared)
         let imagesListViewPresenter = ImagesListViewPresenter(view: imagesListViewController,
                                                               imagesHelper: imagesHelper)
         imagesListViewController.presenter = imagesListViewPresenter
         imagesListViewPresenter.view = imagesListViewController
-        imagesListViewController.tabBarItem = UITabBarItem(
-            title: nil,
-            image: UIImage(systemName: "rectangle.stack.fill"),
-            selectedImage: nil
-        )
+        imagesListViewController.tabBarItem = UITabBarItem(title: nil,
+                                                           image: UIImage(systemName: "rectangle.stack.fill"),
+                                                           selectedImage: nil)
         
+        // MARK: - Profile Tab
         let profileViewController = ProfileViewController()
         let tokenStorage = OAuth2TokenStorage.shared
         let profileService = ProfileService.shared
         let profileImageService = ProfileImageService.shared
+        let profileHelper = ProfileHelper(tokenStorage: tokenStorage,
+                                          profileService: profileService,
+                                          profileImageService: profileImageService)
         let profileViewPresenter = ProfileViewPresenter(view: profileViewController,
-                                                        tokenStorage: tokenStorage,
-                                                        profileService: profileService,
-                                                        profileImageService: profileImageService)
+                                                        profileHelper: profileHelper)
         profileViewController.presenter = profileViewPresenter
         profileViewPresenter.view = profileViewController
-        profileViewController.tabBarItem = UITabBarItem(
-            title: nil,
-            image: UIImage(systemName: "person.crop.circle.fill"),
-            selectedImage: nil
-        )
+        profileViewController.tabBarItem = UITabBarItem(title: nil,
+                                                        image: UIImage(systemName: "person.crop.circle.fill"),
+                                                        selectedImage: nil)
+        
         self.viewControllers = [imagesListViewController, profileViewController]
     }
 }

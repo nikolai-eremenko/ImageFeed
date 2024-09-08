@@ -10,7 +10,7 @@ import Foundation
 protocol ProfileImageServiceProtocol {
     static var shared: Self { get }
     var avatarURL: String? { get set }
-    func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void)
+    func fetchProfileImageURL(request: URLRequest?, _ completion: @escaping (Result<String, Error>) -> Void)
     func clearProfileImageURL()
 }
 
@@ -25,28 +25,17 @@ final class ProfileImageService: ProfileImageServiceProtocol {
     
     private init() { }
     
-    func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
+    func fetchProfileImageURL(request: URLRequest?, _ completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         task?.cancel()
    
-        guard
-            let token = storage.token
-        else {
-            completion(.failure(AuthServiceError.tokenNotFound))
-            return
-        }
-        
-        guard
-            let request = Endpoint.getProfileImage(token: token, username: username).request
-        else {
+        guard let request else {
             completion(.failure(NetworkError.invalidRequest))
             fatalError("cannot create URL")
         }
         
         let task = urlSession.objectTask(for: request) { [weak self] (result: Result<UserResult, Error>) in
-            guard let self = self else { return }
-            
-            print("PROFILE IMAGE REQUEST: \(request)")
+            guard let self else { return }
             
             switch result {
             case .success(let object):

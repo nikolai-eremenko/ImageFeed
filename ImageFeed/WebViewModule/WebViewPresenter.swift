@@ -24,11 +24,13 @@ final class WebViewPresenter: WebViewPresenterProtocol {
     }
     
     func viewDidLoad() {
-        guard let request = authHelper.authRequest() else { return }
-        
-        didUpdateProgressValue(0)
+        guard let request = authHelper.authRequest() else {
+            assertionFailure("Failed to construct authorization URLRequest")
+            return
+        }
 
         view?.load(request: request)
+        didUpdateProgressValue(0)
     }
     
     func didUpdateProgressValue(_ newValue: Double) {
@@ -39,7 +41,6 @@ final class WebViewPresenter: WebViewPresenterProtocol {
         view?.setProgressHidden(shouldHideProgress)
     }
     
-    // для удобства тестирования мы вынесли в отдельный метод функцию вычисления того, должен ли быть скрыт progressView
     func shouldHideProgress(for value: Float) -> Bool {
         abs(value - 1.0) <= 0.0001
     }

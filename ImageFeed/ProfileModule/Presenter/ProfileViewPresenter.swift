@@ -15,27 +15,20 @@ protocol ProfileViewPresenterProtocol {
 
 final class ProfileViewPresenter: ProfileViewPresenterProtocol {
     weak var view: ProfileViewControllerProtocol?
-    private let tokenStorage: OAuth2TokenStorageProtocol
-    private let profileService: ProfileServiceProtocol
-    private let profileImageService: ProfileImageServiceProtocol
+    private let profileHelper: ProfileHelperProtocol
     
     init(
         view: ProfileViewControllerProtocol,
-        tokenStorage: OAuth2TokenStorageProtocol,
-        profileService: ProfileServiceProtocol,
-        profileImageService: ProfileImageServiceProtocol
+        profileHelper: ProfileHelperProtocol
     ) {
         self.view = view
-        self.tokenStorage = tokenStorage
-        self.profileService = profileService
-        self.profileImageService = profileImageService
+        self.profileHelper = profileHelper
     }
     
     func viewDidLoad() {
-        if let token = tokenStorage.token {
-            fetchProfile(token)
+        if profileHelper.isAuthorized() {
+            fetchProfile()
         } else {
-            // TODO: add alert
             switchToSplashScreen()
         }
     }
@@ -60,7 +53,7 @@ private extension ProfileViewPresenter {
                 else {
                     return
                 }
-                self.profileService.logout(view)
+                self.profileHelper.clearUserData(vc: view)
             }
         )
         return model
@@ -78,20 +71,12 @@ private extension ProfileViewPresenter {
     }
     
     // MARK: - Fetching
-    func fetchProfile(_ token: String) {
-        profileService.fetchProfile(token) { [weak self] result in
+    func fetchProfile() {
+        profileHelper.fetchProfile { [weak self] result in
             guard let self else { return }
             
             switch result {
             case .success(let profile):
-                print("DEBUG",
-                      "[\(String(describing: self)).\(#function)]:",
-                      "Profile fetched",
-                      "Username: \(profile.username)",
-                      "Name: \(profile.name)",
-                      "LoginName: \(profile.loginName)",
-                      "Bio: \(profile.bio ?? "nil")",
-                      separator: "\n")
                 self.fetchProfileImageURL(username: profile.username)
                 self.view?.updateProfileDetails(with: profile)
             case .failure(let error):
@@ -101,16 +86,11 @@ private extension ProfileViewPresenter {
     }
     
     func fetchProfileImageURL(username: String) {
-        profileImageService.fetchProfileImageURL(username: username) { [weak self] result in
+        profileHelper.fetchProfileImageURL(username: username) { [weak self] result in
             guard let self else { return }
             
             switch result {
             case .success(let imageStringURL):
-                print("DEBUG",
-                      "[\(String(describing: self)).\(#function)]:",
-                      "ProfileImageURL fetched",
-                      "URL: \(imageStringURL)",
-                      separator: "\n")
                 self.view?.updateProfileImage(with: imageStringURL)
             case .failure(let error):
                 self.view?.failureProfileImage(error: error)

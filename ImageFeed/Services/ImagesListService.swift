@@ -9,33 +9,41 @@ import Foundation
 
 protocol ImagesListServiceProtocol {
     var photos: [Photo] { get }
-    func fetchPhotosNextPage()
-    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void)
+    static var shared: Self { get }
+    func fetchPhotosNextPage(request: URLRequest?,
+                             _ completion: @escaping (Result<String, Error>) -> Void)
+    func changeLike(request: URLRequest?, photoId: String, _ completion: @escaping (Result<Void, Error>) -> Void)
+    func clearPhotosURL()
 }
 
 final class ImagesListService: ImagesListServiceProtocol {
     // MARK: - properties
+    static let shared = ImagesListService()
+    static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
+    
     private let urlSession = URLSession.shared
     private var fetchPhotosTask: URLSessionTask?
     private var changeLikeTask: URLSessionTask?
-    private(set) var photos = [Photo]()
-    private var lastLoadedPage: Int = 0
-    private let perPage: Int = 10
-    private let tokenStorage = OAuth2TokenStorage.shared
+    private let dateFormatter = DateConvertor.shared
     
-    static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
+    private(set) var photos = [Photo]()
+    
+    private init() { }
     
     // MARK: - Fetch photos
-    func fetchPhotosNextPage() {
+    func fetchPhotosNextPage(request: URLRequest?,
+                             _ completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         
-        guard let token = tokenStorage.token, fetchPhotosTask == nil else { return }
+        guard fetchPhotosTask == nil else {
+            print("DEBUG",
+                  "[\(String(describing: self)).\(#function)]:",
+                  "Fetch task is already in progress",
+                  separator: "\n")
+            return
+        }
         
-        let nextPage = lastLoadedPage + 1
-        
-        guard
-            let request = Endpoint.getImages(token: token, page: nextPage, perPage: perPage).request
-        else {
+        guard let request else {
             print("cannot create URL")
             return
         }
@@ -49,7 +57,6 @@ final class ImagesListService: ImagesListServiceProtocol {
                 
                 DispatchQueue.main.async {
                     self.photos.append(contentsOf: photos)
-                    self.lastLoadedPage = nextPage
                     NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
                     self.fetchPhotosTask = nil
                 }
@@ -69,7 +76,7 @@ final class ImagesListService: ImagesListServiceProtocol {
     }
     
     // MARK: - Change like
-    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
+    func changeLike(request: URLRequest?, photoId: String, _ completion: @escaping (Result<Void, Error>) -> Void) {
         assert(Thread.isMainThread)
         
         if changeLikeTask != nil {
@@ -80,12 +87,8 @@ final class ImagesListService: ImagesListServiceProtocol {
             changeLikeTask?.cancel()
         }
         
-        guard let token = tokenStorage.token else { return }
-        
-        guard
-            let request = Endpoint.changeLike(photoId: photoId, isLike: isLike, token: token).request
-        else {
-            completion(.failure(NetworkError.invalidRequest))
+        guard let request else {
+            print("cannot create URL")
             return
         }
         
@@ -109,6 +112,7 @@ final class ImagesListService: ImagesListServiceProtocol {
                 let newPhoto = Photo(photo: photo, isLiked: !photo.isLiked)
                 DispatchQueue.main.async {
                     self.photos = self.photos.withReplaced(itemAt: index, newValue: newPhoto)
+                    NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
                 }
                 
                 completion(.success(Void()))
@@ -119,7 +123,7 @@ final class ImagesListService: ImagesListServiceProtocol {
         task.resume()
     }
     
-    func cleanImagesList() {
+    func clearPhotosURL() {
         photos.removeAll()
     }
 }
