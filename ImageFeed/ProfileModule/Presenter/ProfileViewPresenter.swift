@@ -11,6 +11,7 @@ protocol ProfileViewPresenterProtocol {
     var view: ProfileViewControllerProtocol? { get set }
     func didTapLogoutButton()
     func viewDidLoad()
+    func viewDidAppear()
 }
 
 final class ProfileViewPresenter: ProfileViewPresenterProtocol {
@@ -26,11 +27,13 @@ final class ProfileViewPresenter: ProfileViewPresenterProtocol {
     }
     
     func viewDidLoad() {
-        if profileHelper.isAuthorized() {
-            fetchProfile()
-        } else {
+        if !profileHelper.isAuthorized() {
             switchToSplashScreen()
         }
+    }
+    
+    func viewDidAppear() {
+        fetchProfile()
     }
     
     func didTapLogoutButton() {

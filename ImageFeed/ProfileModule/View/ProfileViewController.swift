@@ -42,9 +42,7 @@ final class ProfileViewController: UIViewController {
     
     private lazy var profilePhotoImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "ic.person.crop.circle.fill")
         imageView.tintColor = .ypGray
-        imageView.backgroundColor = .ypWhite
         imageView.layer.cornerRadius = 35
         imageView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -65,7 +63,6 @@ final class ProfileViewController: UIViewController {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 23, weight: .bold)
         label.textColor = UIColor(named: "YPWhite")
-        label.text = ""
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -74,7 +71,6 @@ final class ProfileViewController: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
         label.textColor = UIColor(named: "YPGray")
-        label.text = ""
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -83,9 +79,29 @@ final class ProfileViewController: UIViewController {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
         label.textColor = UIColor(named: "YPWhite")
-        label.text = ""
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    lazy var nameAnimationView: UIView = {
+        let view = UIView()
+        
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    lazy var nickAnimationView: UIView = {
+        let view = UIView()
+        
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    lazy var aboutAnimationView: UIView = {
+        let view = UIView()
+        
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     
     //MARK: - Lifecycle
@@ -96,6 +112,14 @@ final class ProfileViewController: UIViewController {
         setupViews()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        
+        addLoadingAnimation()
+        presenter?.viewDidAppear()
+    }
+    
     // MARK: - Logout Alert
     func showLogoutAlert(model: AlertModel) {
         AlertPresenter.showAlert(on: self, model: model)
@@ -103,6 +127,30 @@ final class ProfileViewController: UIViewController {
 }
 
 private extension ProfileViewController {
+    func updateProfileWithPlaceholder() {
+        let placeHolderProfile = Profile(username: "Екатерина", name: "Новикова", loginName: "@ekaterina_nov", bio: "Hello, world!")
+        updateProfileDetails(with: placeHolderProfile)
+    }
+    
+    //MARK: - Animations
+    func addLoadingAnimation() {
+        profilePhotoImageView.addLoadingLayer(radius: profilePhotoImageView.frame.width/2)
+        
+        nameAnimationView.addLoadingLayer(radius: nameAnimationView.frame.height/2)
+        nickAnimationView.addLoadingLayer(radius: nickAnimationView.frame.height/2)
+        aboutAnimationView.addLoadingLayer(radius: aboutAnimationView.frame.height/2)
+    }
+    
+    func removeLoadingAnimation() {
+        nameAnimationView.removeLoadingLayer()
+        nickAnimationView.removeLoadingLayer()
+        aboutAnimationView.removeLoadingLayer()
+        
+        nameAnimationView.removeFromSuperview()
+        nickAnimationView.removeFromSuperview()
+        aboutAnimationView.removeFromSuperview()
+    }
+    
     //MARK: - Actions
     @objc
     func logoutAction() {
@@ -120,6 +168,11 @@ private extension ProfileViewController {
         profileStackView.addArrangedSubview(aboutLabel)
         headerStackView.addArrangedSubview(profilePhotoImageView)
         headerStackView.addArrangedSubview(logoutButton)
+        
+        fullNameLabel.addSubview(nameAnimationView)
+        nickNameLabel.addSubview(nickAnimationView)
+        aboutLabel.addSubview(aboutAnimationView)
+        
         setupConstraints()
     }
     
@@ -129,18 +182,30 @@ private extension ProfileViewController {
             profileStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             profileStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             profilePhotoImageView.widthAnchor.constraint(equalToConstant: 70),
-            profilePhotoImageView.heightAnchor.constraint(equalToConstant: 70)
+            profilePhotoImageView.heightAnchor.constraint(equalToConstant: 70),
+            
+            fullNameLabel.heightAnchor.constraint(equalToConstant: 18),
+            nickNameLabel.heightAnchor.constraint(equalToConstant: 18),
+            aboutLabel.heightAnchor.constraint(equalToConstant: 18),
+            
+            nameAnimationView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.6),
+            nameAnimationView.heightAnchor.constraint(equalToConstant: 18),
+            nickAnimationView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.24),
+            nickAnimationView.heightAnchor.constraint(equalToConstant: 18),
+            aboutAnimationView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.16),
+            aboutAnimationView.heightAnchor.constraint(equalToConstant: 18)
         ])
     }
 }
 
 extension ProfileViewController: ProfileViewControllerProtocol {
-    
     // MARK: - Profile
     func updateProfileDetails(with model: Profile) {
         fullNameLabel.text = model.name
         nickNameLabel.text = model.loginName
         aboutLabel.text = model.bio
+        
+        removeLoadingAnimation()
     }
     
     func failureProfileDetails(error: any Error) {
@@ -150,6 +215,7 @@ extension ProfileViewController: ProfileViewControllerProtocol {
               "ProfileService error -",
               error.localizedDescription,
               separator: "\n")
+        removeLoadingAnimation()
     }
     
     // MARK: - ProfileImage
@@ -164,13 +230,13 @@ extension ProfileViewController: ProfileViewControllerProtocol {
         
         profilePhotoImageView.kf.setImage(
             with: url,
-            placeholder: placeholderImage,
             options: [
                 .processor(processor),
-                .cacheSerializer(pngSerializer),
-                .transition(.fade(1))
+                .cacheSerializer(pngSerializer)
             ]
-        ) { result in
+        ) { [weak self] result in
+            guard let self else { return }
+            
             switch result {
             case .success(let value):
                 let cacheType: String
@@ -195,6 +261,7 @@ extension ProfileViewController: ProfileViewControllerProtocol {
                       "Error loading image:",
                       error.localizedDescription)
             }
+            self.profilePhotoImageView.removeLoadingLayer()
         }
     }
     
