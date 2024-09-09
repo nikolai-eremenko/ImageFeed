@@ -14,26 +14,13 @@ final class ImagesListViewTests: XCTestCase {
     var imagesHelper: ImagesListHelper!
     var presenter: ImagesListViewPresenter!
     var viewController: ImagesListViewController!
-//    var photos: [Photo]!
 
     override func setUpWithError() throws {
         imagesListService = ImagesListService()
-        dateFormatter = DateConvertor.shared
+        dateFormatter = DateConvertor()
         imagesHelper = ImagesListHelper(imagesListService: imagesListService, dateFormatter: dateFormatter)
         viewController = ImagesListViewController()
         presenter = ImagesListViewPresenter(view: viewController, imagesHelper: imagesHelper)
-        
-//        photos = (0...9).map { _ in
-//            Photo(id: "Quux",
-//                  size: CGSize(width: 100, height: 100),
-//                  createdAt: Date(),
-//                  welcomeDescription: "Quuux",
-//                  fullImageURL: "Foo",
-//                  largeImageURL: "Bar",
-//                  smallImageURL: "Baz",
-//                  thumbImageURL: "Quuuux",
-//                  isLiked: false)
-//        }
     }
 
     override func tearDownWithError() throws {
@@ -42,9 +29,8 @@ final class ImagesListViewTests: XCTestCase {
         imagesHelper = nil
         viewController = nil
         presenter = nil
-//        photos = nil
     }
-//    
+   
     func testViewControllerCallsPresentersViewDidLoad() {
         //given
         let viewController = ImagesListViewController()

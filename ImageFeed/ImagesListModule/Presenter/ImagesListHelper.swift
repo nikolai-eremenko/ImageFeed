@@ -14,12 +14,10 @@ protocol ImagesListHelperProtocol {
     func getInsertIndexPaths() -> [IndexPath]?
     func changeLike(indexPath: IndexPath, _ completion: @escaping (Result<Bool, Error>) -> Void)
     func getImageStringURL(indexPath: IndexPath) -> String?
-    func getStringFromDate(from date: Date) -> String
 }
 
 final class ImagesListHelper: ImagesListHelperProtocol {
     private let imagesListService: ImagesListServiceProtocol
-    private let dateFormatter: DateConvertorProtocol
     private var tokenStorage: OAuth2TokenStorageProtocol
     
     private var photos = [Photo]()
@@ -29,10 +27,8 @@ final class ImagesListHelper: ImagesListHelperProtocol {
     
     // MARK: - Init
     init(imagesListService: ImagesListServiceProtocol,
-         dateFormatter: DateConvertorProtocol,
          tokenStorage: OAuth2TokenStorageProtocol) {
         self.imagesListService = imagesListService
-        self.dateFormatter = dateFormatter
         self.tokenStorage = tokenStorage
     }
     
@@ -98,10 +94,6 @@ final class ImagesListHelper: ImagesListHelperProtocol {
     func getImageStringURL(indexPath: IndexPath) -> String? {
         guard let photo = photos[safeIndex: indexPath.row] else { return nil }
         return photo.fullImageURL
-    }
-    
-    func getStringFromDate(from date: Date) -> String {
-        return dateFormatter.getStringFromDate(from: date)
     }
     
     func getPhotosCount() -> Int {

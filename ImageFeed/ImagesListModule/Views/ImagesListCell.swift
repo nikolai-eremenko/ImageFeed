@@ -14,7 +14,7 @@ protocol ImagesListCellDelegate: AnyObject {
 
 final class ImagesListCell: UITableViewCell {
     weak var delegate: ImagesListCellDelegate?
-    var presenter: ImagesListViewPresenterProtocol?
+    private let dateFormatter = DateConvertor.shared
         
     //MARK: - UI Components
     private lazy var cellView: UIView = {
@@ -55,6 +55,7 @@ final class ImagesListCell: UITableViewCell {
     
     private lazy var dateLabel: UILabel = {
         let view = UILabel()
+        view.text = "12/0/2"
         view.font = .systemFont(ofSize: 13, weight: .regular)
         view.textColor = .ypWhite
 
@@ -110,8 +111,9 @@ final class ImagesListCell: UITableViewCell {
         imageState = .loading
         
         let stringDate: String
+        
         if let date = model.createdAt {
-            stringDate = presenter?.getStringFromDate(from: date) ?? ""
+            stringDate = dateFormatter.getStringFromDate(from: date)
         } else {
             stringDate = ""
         }
@@ -161,17 +163,17 @@ final class ImagesListCell: UITableViewCell {
     
     // MARK: - Animations
     func addLoadingAnimation() {
-        likeButton.isHidden = true
-        dateLabel.isHidden = true
-        gradientView.isHidden = true
+//        likeButton.isHidden = true
+//        dateLabel.isHidden = true
+//        gradientView.isHidden = true
         layoutIfNeeded()
         cellImageView.addLoadingLayer(radius: cellView.layer.cornerRadius)
     }
     
     func removeLoadingAnimation() {
-        likeButton.isHidden = false
-        dateLabel.isHidden = false
-        gradientView.isHidden = false
+//        likeButton.isHidden = false
+//        dateLabel.isHidden = false
+//        gradientView.isHidden = false
         layoutIfNeeded()
         cellImageView.removeLoadingLayer()
     }

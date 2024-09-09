@@ -15,7 +15,6 @@ protocol ImagesListViewPresenterProtocol: NSObject, UITableViewDataSource {
     func didSelectImage(indexPath: IndexPath)
     func getPhoto(indexPath: IndexPath) -> Photo?
     func getPhotosCount() -> Int
-    func getStringFromDate(from date: Date) -> String
     func updateTableViewAnimated()
     func getLikeErrorAlert() -> AlertModel
 }
@@ -68,9 +67,9 @@ final class ImagesListViewPresenter: NSObject, ImagesListViewPresenterProtocol {
         return imagesHelper.getPhoto(indexPath: indexPath)
     }
     
-    func getStringFromDate(from date: Date) -> String {
-        return imagesHelper.getStringFromDate(from: date)
-    }
+//    func getStringFromDate(from date: Date) -> String {
+//        return imagesHelper.getStringFromDate(from: date)
+//    }
     
     // MARK: - Insert rows
     func updateTableViewAnimated() {

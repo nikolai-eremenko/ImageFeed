@@ -32,9 +32,7 @@ final class TabBarController: UITabBarController {
         // MARK: - ImagesList Tab
         let imagesListViewController = ImagesListViewController()
         let imagesListService = ImagesListService()
-        let dateFormatter = DateConvertor.shared
         let imagesHelper = ImagesListHelper(imagesListService: imagesListService,
-                                            dateFormatter: dateFormatter,
                                             tokenStorage: OAuth2TokenStorage.shared)
         let imagesListViewPresenter = ImagesListViewPresenter(view: imagesListViewController,
                                                               imagesHelper: imagesHelper)

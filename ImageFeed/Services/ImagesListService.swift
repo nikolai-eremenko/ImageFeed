@@ -16,7 +16,7 @@ protocol ImagesListServiceProtocol {
 final class ImagesListService: ImagesListServiceProtocol {
     // MARK: - properties
     static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
-    
+    private let dateFormatter = DateConvertor.shared
     private let urlSession = URLSession.shared
     private var fetchPhotosTask: URLSessionTask?
     private var changeLikeTask: URLSessionTask?
@@ -45,7 +45,17 @@ final class ImagesListService: ImagesListServiceProtocol {
             
             switch result {
             case .success(let object):
-                let photos = object.map { Photo(photoResult: $0) }
+                let photos = object.map {
+                    Photo(id: $0.id,
+                          size: CGSize(width: $0.width, height: $0.height),
+                          createdAt: self.dateFormatter.getDateFromString(from: $0.createdAt),
+                          welcomeDescription: $0.description,
+                          fullImageURL: $0.urls.full,
+                          largeImageURL: $0.urls.regular,
+                          smallImageURL: $0.urls.small,
+                          thumbImageURL: $0.urls.thumb,
+                          isLiked: $0.likedByUser)
+                }
                 
                 DispatchQueue.main.async {
                     self.photos.append(contentsOf: photos)
@@ -100,7 +110,15 @@ final class ImagesListService: ImagesListServiceProtocol {
             
             if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
                 let photo = self.photos[index]
-                let newPhoto = Photo(photo: photo, isLiked: !photo.isLiked)
+                let newPhoto = Photo(id: photo.id,
+                                     size: photo.size,
+                                     createdAt: photo.createdAt,
+                                     welcomeDescription: photo.welcomeDescription,
+                                     fullImageURL: photo.fullImageURL,
+                                     largeImageURL: photo.largeImageURL,
+                                     smallImageURL: photo.smallImageURL,
+                                     thumbImageURL: photo.thumbImageURL,
+                                     isLiked: !photo.isLiked)
                 DispatchQueue.main.async {
                     self.photos = self.photos.withReplaced(itemAt: index, newValue: newPhoto)
                     NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
