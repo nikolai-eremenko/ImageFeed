@@ -14,11 +14,13 @@ final class ImagesListViewTests: XCTestCase {
     var imagesHelper: ImagesListHelper!
     var presenter: ImagesListViewPresenter!
     var viewController: ImagesListViewController!
+    var tokenStorage: OAuth2TokenStorageProtocol!
 
     override func setUpWithError() throws {
         imagesListService = ImagesListService()
-        dateFormatter = DateConvertor()
-        imagesHelper = ImagesListHelper(imagesListService: imagesListService, dateFormatter: dateFormatter)
+        dateFormatter = DateConvertor.shared
+        tokenStorage = OAuth2TokenStorage.shared
+        imagesHelper = ImagesListHelper(imagesListService: imagesListService, tokenStorage: tokenStorage)
         viewController = ImagesListViewController()
         presenter = ImagesListViewPresenter(view: viewController, imagesHelper: imagesHelper)
     }
@@ -31,9 +33,9 @@ final class ImagesListViewTests: XCTestCase {
         presenter = nil
     }
    
+    //MARK: - ViewControllerCalls
     func testViewControllerCallsPresentersViewDidLoad() {
         //given
-        let viewController = ImagesListViewController()
         let presenter = ImagesListViewPresenterSpy(view: viewController, imagesHelper: imagesHelper)
         viewController.presenter = presenter
         
@@ -44,63 +46,86 @@ final class ImagesListViewTests: XCTestCase {
         XCTAssertTrue(presenter.isViewDidLoadCalled)
     }
     
-//    func testViewControllerCallsPresentersFetchPhotosNextPage() {
-//        //given
-//        let viewController = ImagesListViewController()
-//        let presenter = ImagesListViewPresenterSpy(view: viewController,
-//                                                   imagesHelper: imagesHelper)
-//        viewController.presenter = presenter
-//        
-//        //when
-//        viewController.loadViewIfNeeded()
-//        
-//        //then
-//        XCTAssertTrue(presenter.isFetchPhotosNextPageCalled)
-//    }
-//    
-//    func testViewControllerCallsPresentersGetPhoto() {
-//        // given
-//        let viewController = ImagesListViewController()
-//        let presenter = ImagesListViewPresenterSpy(view: viewController, imagesHelper: imagesHelper)
-//        viewController.presenter = presenter
-//        
-//        // when
-//        viewController.loadViewIfNeeded()
-//        viewController.configCell(for: ImagesListCell(), with: IndexPath(row: 2, section: 0))
-//        
-//        //then
-//        XCTAssertTrue(presenter.isGetPhotoCalled)
-//    }
+    func testViewControllerCallsPresentersDidSelectImage() {
+        //given
+        let presenter = ImagesListViewPresenterSpy(view: viewController, imagesHelper: imagesHelper)
+        viewController.presenter = presenter
+        
+        //when
+        viewController.loadViewIfNeeded()
+        let indexPath = IndexPath(row: 2, section: 0)
+        presenter.didSelectImage(indexPath: indexPath)
+        
+        //then
+        XCTAssertTrue(presenter.isDidSelectImageCalled)
+    }
     
-//    func testPresenterCallViewShowSingleImage() {
-//        //given
-//        let viewController = ImagesListViewControllerSpy()
-//        let presenter = ImagesListViewPresenter(view: viewController, imagesHelper: imagesHelper)
-//        viewController.presenter = presenter
-//        presenter.view = viewController
-//        imagesHelper.photos.append(contentsOf: photos)
-//        
-//        //when
-//        presenter.didSelectImage(indexPath: IndexPath(row: 2, section: 0))
-//        
-//        //then
-//        XCTAssertTrue(viewController.isShowSingleImageCalled)
-//    }
+    func testViewControllerCallsPresentersFetchPhotosNextPage() {
+        //given
+        let presenter = ImagesListViewPresenterSpy(view: viewController, imagesHelper: imagesHelper)
+        viewController.presenter = presenter
+        
+        //when
+        viewController.loadViewIfNeeded()
+        presenter.fetchPhotosNextPage()
+        
+        //then
+        XCTAssertTrue(presenter.isFetchPhotosNextPageCalled)
+    }
     
-//    func testPresenterReturnsIndexPathsForTableViewInsertRows() {
-//        //given
-//        let viewController = ImagesListViewControllerSpy()
-//        let presenter = ImagesListViewPresenter(view: viewController, imagesHelper: imagesHelper)
-//        viewController.presenter = presenter
-//        presenter.view = viewController
-//        imagesHelper.photos.append(contentsOf: photos)
-//        imagesListService.photos.append(contentsOf: photos)
-//        imagesListService.photos.append(contentsOf: photos)
-//        
-//        //when
-//        presenter.updateTableViewAnimated()
-//        
-//        //then
-//        XCTAssertEqual(viewController.receivedIndexPaths.count, photos.count)
-//    }
+    func testViewControllerCallsPresentersGetPhoto() {
+        //given
+        let presenter = ImagesListViewPresenterSpy(view: viewController, imagesHelper: imagesHelper)
+        viewController.presenter = presenter
+        let indexPath = IndexPath(row: 2, section: 0)
+        
+        //when
+        viewController.loadViewIfNeeded()
+        _ = presenter.getPhoto(indexPath: indexPath)
+        
+        //then
+        XCTAssertTrue(presenter.isGetPhotoCalled)
+    }
+    
+    func testViewControllerCallsPresentersDidTapLikeButton() {
+        //given
+        let presenter = ImagesListViewPresenterSpy(view: viewController, imagesHelper: imagesHelper)
+        viewController.presenter = presenter
+        let indexPath = IndexPath(row: 2, section: 0)
+        
+        //when
+        viewController.loadViewIfNeeded()
+        presenter.didTapLikeButton(indexPath: indexPath) { _ in }
+        
+        //then
+        XCTAssertTrue(presenter.isDidTapLikeButtonCalled)
+    }
+    
+    //MARK: - PresenterCalls
+    func testPresenterCallsViewShowSingleImage() {
+        //given
+        let view = ImagesListViewControllerSpy()
+        view.presenter = presenter
+        
+        //when
+        view.loadViewIfNeeded()
+        view.showSingleImage(vc: UIViewController())
+        
+        //then
+        XCTAssertTrue(view.isShowSingleImageCalled)
+    }
+    
+    func testPresenterCallsViewTableViewInsertRows() {
+        //given
+        let view = ImagesListViewControllerSpy()
+        view.presenter = presenter
+        let indexPaths = [IndexPath(row: 2, section: 0)]
+        
+        //when
+        view.loadViewIfNeeded()
+        view.tableViewInsertRows(at: indexPaths)
+        
+        //then
+        XCTAssertTrue(view.isTableViewInsertRowsCalled)
+    }
 }

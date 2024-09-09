@@ -9,9 +9,13 @@
 import Foundation
 
 final class ProfileViewPresenterSpy: ProfileViewPresenterProtocol {
+    
     var view: ProfileViewControllerProtocol?
     var viewDidLoadCalled: Bool = false
 
+    func viewDidAppear() {
+        
+    }
     
     func didTapLogoutButton() {
         

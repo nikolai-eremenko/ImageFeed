@@ -67,10 +67,6 @@ final class ImagesListViewPresenter: NSObject, ImagesListViewPresenterProtocol {
         return imagesHelper.getPhoto(indexPath: indexPath)
     }
     
-//    func getStringFromDate(from date: Date) -> String {
-//        return imagesHelper.getStringFromDate(from: date)
-//    }
-    
     // MARK: - Insert rows
     func updateTableViewAnimated() {
         guard let indexPaths = imagesHelper.getInsertIndexPaths() else { return }

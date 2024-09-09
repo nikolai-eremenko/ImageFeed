@@ -36,7 +36,7 @@ final class ImagesListCell: UITableViewCell {
     
     private lazy var gradientView: GradientView = {
         let view = GradientView()
-        view.startColor = .ypGradient
+        view.startColor = .ypBlack
         view.endColor = .clear
         view.angle = 90
         
@@ -163,17 +163,17 @@ final class ImagesListCell: UITableViewCell {
     
     // MARK: - Animations
     func addLoadingAnimation() {
-//        likeButton.isHidden = true
-//        dateLabel.isHidden = true
-//        gradientView.isHidden = true
+        likeButton.isHidden = true
+        dateLabel.isHidden = true
+        gradientView.isHidden = true
         layoutIfNeeded()
         cellImageView.addLoadingLayer(radius: cellView.layer.cornerRadius)
     }
     
     func removeLoadingAnimation() {
-//        likeButton.isHidden = false
-//        dateLabel.isHidden = false
-//        gradientView.isHidden = false
+        likeButton.isHidden = false
+        dateLabel.isHidden = false
+        gradientView.isHidden = false
         layoutIfNeeded()
         cellImageView.removeLoadingLayer()
     }

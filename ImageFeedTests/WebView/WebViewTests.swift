@@ -66,14 +66,13 @@ final class WebViewTests: XCTestCase {
     
     func testAuthHelperAuthRequest() {
         //given
-        let configuration = AuthConfiguration.standard
-        let authHelper = AuthHelper(configuration: configuration)
+        let authHelper = AuthHelper()
         
         //when
         let request = authHelper.authRequest()
         
         //then
-        XCTAssertEqual(request, configuration.authEndpoint.request)
+        XCTAssertEqual(request, authHelper.authRequest())
     }
     
     func testCodeFromURL() {

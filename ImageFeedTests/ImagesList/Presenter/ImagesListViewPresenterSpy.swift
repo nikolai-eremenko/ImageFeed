@@ -9,11 +9,12 @@
 import UIKit
 
 final class ImagesListViewPresenterSpy: NSObject, ImagesListViewPresenterProtocol {
+    
     weak var view: ImagesListViewControllerProtocol?
     private let imagesHelper: ImagesListHelperProtocol
-//    private var imageListServiceObserver: NSObjectProtocol?
     
     var isViewDidLoadCalled = false
+    var isDidSelectImageCalled = false
     var isFetchPhotosNextPageCalled = false
     var isDidTapLikeButtonCalled = false
     var isGetPhotoCalled = false
@@ -28,19 +29,14 @@ final class ImagesListViewPresenterSpy: NSObject, ImagesListViewPresenterProtoco
     
     func viewDidLoad() {
         isViewDidLoadCalled = true
-        
-//        addImageListServiceObserver()
-        fetchPhotosNextPage()
     }
+    
     func fetchPhotosNextPage() {
+        imagesHelper.fetchPhotosNextPage()
         isFetchPhotosNextPageCalled = true
-//        imagesHelper.fetchPhotosNextPage()
     }
     
     func updateTableViewAnimated() {
-//        guard let indexPaths = imagesHelper.getInsertIndexPaths() else { return }
-//        
-//        view?.tableViewInsertRows(at: indexPaths)
     }
     
     func getPhoto(indexPath: IndexPath) -> Photo? {
@@ -48,6 +44,17 @@ final class ImagesListViewPresenterSpy: NSObject, ImagesListViewPresenterProtoco
         return imagesHelper.getPhoto(indexPath: indexPath)
     }
     
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return imagesHelper.getPhotosCount()
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath) as! ImagesListCell
+        cell.delegate = self.view
+        cell.configure(with: imagesHelper.getPhoto(indexPath: indexPath)!)
+        return cell
+    }
     
     // MARK: - Like
     func didTapLikeButton(indexPath: IndexPath, _ completion: @escaping (Result<Bool, any Error>) -> Void) {
@@ -58,26 +65,8 @@ final class ImagesListViewPresenterSpy: NSObject, ImagesListViewPresenterProtoco
         return imagesHelper.getPhotosCount()
     }
     
-    func getStringFromDate(from date: Date) -> String {
-        return imagesHelper.getStringFromDate(from: date)
-    }
-    
     func didSelectImage(indexPath: IndexPath) {
-        guard
-            let stringURL = imagesHelper.getImageStringURL(indexPath: indexPath),
-            let imageURL = URL(string: stringURL)
-        else {
-            return
-        }
-        
-        let viewController = SingleImageViewController()
-        let presenter = SingleImageViewPresenter(view: viewController, imageURL: imageURL)
-        viewController.presenter = presenter
-        presenter.view = viewController
-        
-        viewController.modalPresentationStyle = .fullScreen
-        
-        view?.showSingleImage(vc: viewController)
+        isDidSelectImageCalled = true
     }
     
     // MARK: - Alert
@@ -90,35 +79,5 @@ final class ImagesListViewPresenterSpy: NSObject, ImagesListViewPresenterProtoco
             completion: { }
         )
         return model
-    }
-    
-    // MARK: - Notifications
-//    private func addImageListServiceObserver() {
-//        imageListServiceObserver = NotificationCenter.default.addObserver(
-//            forName: ImagesListService.didChangeNotification,
-//            object: nil,
-//            queue: .main
-//        ) { [weak self] _ in
-//            guard let self else { return }
-//            
-//            self.updateTableViewAnimated()
-//        }
-//    }
-}
-
-// MARK: - UITableViewDataSource
-extension ImagesListViewPresenterSpy: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return imagesHelper.getPhotosCount()
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if let cell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath) as? ImagesListCell {
-            cell.delegate = view
-            view?.configCell(for: cell, with: indexPath)
-            return cell
-        } else {
-            return UITableViewCell()
-        }
     }
 }

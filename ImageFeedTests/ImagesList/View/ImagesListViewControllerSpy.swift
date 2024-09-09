@@ -13,79 +13,22 @@ final class ImagesListViewControllerSpy: UIViewController, ImagesListViewControl
     var presenter: ImagesListViewPresenterProtocol?
     
     var isShowSingleImageCalled = false
-//    var isTableViewInsertRowsCalled = false
-    var receivedIndexPaths = [IndexPath]()
+    var isTableViewInsertRowsCalled = false
+//    var receivedIndexPaths = [IndexPath]()
     
 //    var isTableViewInsertRowsCalled = false
-    
-    //MARK: - UI Components
-    private lazy var tableView: UITableView = {
-        let view = UITableView()
-        view.delegate = self
-        view.dataSource = presenter
-        view.backgroundColor = .clear
-        view.separatorStyle = .none
-        view.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
-        return view
-    }()
     
     // MARK: - Cell
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        guard let photo = presenter?.getPhoto(indexPath: indexPath) else { return }
-        
-        let stringDate: String
-        
-        if let date = photo.createdAt {
-            stringDate = presenter?.getStringFromDate(from: date) ?? ""
-        } else {
-            stringDate = ""
-        }
-
-        guard let url = URL(string: photo.smallImageURL) else {return}
-        
-        cell.cellImageView.kf.indicatorType = .activity
-        cell.cellImageView.kf.setImage(with: url,
-                              placeholder: UIImage(named: "ic.scribble.variable"),
-                              options: [.transition(.fade(1))]) { [weak self] result in
-            guard let self else {return}
-            switch result {
-            case .success(let value):
-                cell.configure(image: value.image, date: stringDate, isLiked: photo.isLiked)
-                
-                let cacheType: String
-                switch value.cacheType {
-                case .none:
-                    cacheType = "Network"
-                case .memory:
-                    cacheType = "Memory"
-                case .disk:
-                    cacheType = "Disk"
-                }
-                
-                print("DEBUG",
-                      "Image loaded from - \(cacheType)",
-                      "Source - \(value.source)",
-                      separator: "\n")
-                
-            case .failure(let error):
-                print("DEBUG",
-                      "[\(String(describing: self)).\(#function)]:",
-                      "Error loading image:",
-                      error.localizedDescription)
-                guard let placeholder = UIImage(named: "ic.scribble.variable") else {return}
-                cell.configure(image: placeholder, date: stringDate, isLiked: photo.isLiked)
-            }
-        }
     }
     
     func tableViewInsertRows(at indexPaths: [IndexPath]) {
-        receivedIndexPaths = indexPaths
-//        isTableViewInsertRowsCalled = true
+//        receivedIndexPaths = indexPaths
+        isTableViewInsertRowsCalled = true
     }
     
     func showSingleImage(vc: UIViewController) {
         isShowSingleImageCalled = true
-//        present(vc, animated: true)
     }
     
     // MARK: - Alerts
@@ -93,22 +36,6 @@ final class ImagesListViewControllerSpy: UIViewController, ImagesListViewControl
         AlertPresenter.showAlert(on: self, model: model)
     }
     
-    // MARK: - UI
-    private func setupUI() {
-        view.backgroundColor = .ypBlack
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-    }
-    
-    // MARK: - Constraints
-    private func setupConstraints() {
-        NSLayoutConstraint.activate([
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-    }
 }
 
 // MARK: - UITableViewDelegate
@@ -129,10 +56,7 @@ extension ImagesListViewControllerSpy: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let photosCount = presenter?.getPhotosCount() else { return }
-        if indexPath.row + 1 == photosCount {
-            presenter?.fetchPhotosNextPage()
-        }
+
     }
 }
 
