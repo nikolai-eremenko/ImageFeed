@@ -8,10 +8,10 @@
 import UIKit
 
 extension UIView {
-    static let nameLoadingLayer = "addLoadingAnimation"
+    static let loadingLayerName = "addLoadingAnimation"
     
     var loadingLayer: CAGradientLayer? {
-        layer.sublayers?.first(where: { $0.name == UIView.nameLoadingLayer }) as? CAGradientLayer
+        layer.sublayers?.first(where: { $0.name == UIView.loadingLayerName }) as? CAGradientLayer
     }
     
     func addLoadingLayer(radius: CGFloat) {
@@ -27,8 +27,9 @@ extension UIView {
         gradient.endPoint = CGPoint(x: 1, y: 0.5)
         gradient.cornerRadius = radius
         gradient.masksToBounds = true
+        
         layer.addSublayer(gradient)
-        gradient.name = UIView.nameLoadingLayer
+        gradient.name = UIView.loadingLayerName
         
         let gradientAnimation = CABasicAnimation(keyPath: "locations")
         gradientAnimation.duration = 1.0
@@ -36,13 +37,10 @@ extension UIView {
         gradientAnimation.fromValue = [0, 0.1, 0.3]
         gradientAnimation.toValue = [0, 0.8, 1]
         gradient.add(gradientAnimation, forKey: "locationsChange")
+        
     }
     
     func removeLoadingLayer() {
         loadingLayer?.removeFromSuperlayer()
-    }
-    
-    func updateLoadingLayerFrame() {
-        loadingLayer?.frame = CGRect(origin: .zero, size: CGSize(width: frame.width, height: frame.height))
     }
 }

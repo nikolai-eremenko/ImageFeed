@@ -8,22 +8,14 @@
 import Foundation
 
 protocol ProfileImageServiceProtocol {
-    static var shared: Self { get }
-    var avatarURL: String? { get set }
     func fetchProfileImageURL(request: URLRequest?, _ completion: @escaping (Result<String, Error>) -> Void)
-    func clearProfileImageURL()
 }
 
 final class ProfileImageService: ProfileImageServiceProtocol {
-    static let shared = ProfileImageService()
-    
     private let storage = OAuth2TokenStorage.shared
-    
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     var avatarURL: String?
-    
-    private init() { }
     
     func fetchProfileImageURL(request: URLRequest?, _ completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
@@ -62,9 +54,5 @@ final class ProfileImageService: ProfileImageServiceProtocol {
         }
         self.task = task
         task.resume()
-    }
-    
-    func clearProfileImageURL() {
-        avatarURL = nil
     }
 }

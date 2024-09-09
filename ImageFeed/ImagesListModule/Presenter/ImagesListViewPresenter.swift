@@ -125,9 +125,17 @@ extension ImagesListViewPresenter: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if let cell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath) as? ImagesListCell {
+            
             cell.delegate = view
-            view?.configCell(for: cell, with: indexPath)
+            
+            guard let photo = imagesHelper.getPhoto(indexPath: indexPath) else {
+                cell.imageState = .error
+                return cell
+            }
+            
+            cell.configure(with: photo)
             return cell
+            
         } else {
             return UITableViewCell()
         }

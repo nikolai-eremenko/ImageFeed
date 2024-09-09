@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 protocol ImagesListCellDelegate: AnyObject {
     func imageListCellDidTapLike(_ cell: ImagesListCell)
@@ -13,18 +14,20 @@ protocol ImagesListCellDelegate: AnyObject {
 
 final class ImagesListCell: UITableViewCell {
     weak var delegate: ImagesListCellDelegate?
+    var presenter: ImagesListViewPresenterProtocol?
         
     //MARK: - UI Components
     private lazy var cellView: UIView = {
         let view = UIView()
         view.layer.masksToBounds = true
         view.layer.cornerRadius = 16
+        
         return view
     }()
     
-    lazy var cellImageView: UIImageView = {
+    private lazy var cellImageView: UIImageView = {
         let view = UIImageView()
-//        view.image = UIImage(named: "0")
+        view.image = UIImage(named: "ic.scribble.variable")
         view.contentMode = .scaleAspectFill
         view.backgroundColor = .clear
         
@@ -36,6 +39,7 @@ final class ImagesListCell: UITableViewCell {
         view.startColor = .ypGradient
         view.endColor = .clear
         view.angle = 90
+        
         return view
     }()
     
@@ -45,6 +49,7 @@ final class ImagesListCell: UITableViewCell {
         view.tintColor = .ypWhiteAlpha50
         view.accessibilityIdentifier = "likeButtonIsNotLiked"
         view.addTarget(self, action: #selector(likeButtonClicked), for: .touchUpInside)
+        
         return view
     }()
     
@@ -52,13 +57,35 @@ final class ImagesListCell: UITableViewCell {
         let view = UILabel()
         view.font = .systemFont(ofSize: 13, weight: .regular)
         view.textColor = .ypWhite
-//        view.text = "27 августа 2022"
+
         return view
     }()
+    
+    enum FeedCellImageState {
+        case loading
+        case error
+        case finished(UIImage)
+    }
+    
+    var imageState: FeedCellImageState = .loading {
+        didSet {
+            switch imageState {
+            case .loading:
+                addLoadingAnimation()
+            case .error:
+                cellImageView.image = UIImage(named: "ic.scribble.variable")
+                removeLoadingAnimation()
+            case .finished(let image):
+                cellImageView.image = image
+                removeLoadingAnimation()
+            }
+        }
+    }
     
     //MARK: - Initialization
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
         setupUI()
         setupConstraints()
     }
@@ -69,27 +96,93 @@ final class ImagesListCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        
         cellImageView.kf.cancelDownloadTask()
         cellImageView.image = nil
         likeButton.tintColor = .ypWhiteAlpha50
         dateLabel.text = nil
+        likeButton.accessibilityIdentifier = "likeButtonIsNotLiked"
+        removeLoadingAnimation()
     }
     
-    // MARK: - Configuration
-    func configure(image: UIImage, date: String, isLiked: Bool) {
-        cellImageView.image = image
-        dateLabel.text = date
-        likeButton.tintColor = isLiked ? .ypRed : .ypWhiteAlpha50
-        likeButton.accessibilityIdentifier = isLiked ? "likeButtonIsLiked" : "likeButtonIsNotLiked"
+    // MARK: - Cell Config
+    func configure(with model: Photo) {
+        imageState = .loading
+        
+        let stringDate: String
+        if let date = model.createdAt {
+            stringDate = presenter?.getStringFromDate(from: date) ?? ""
+        } else {
+            stringDate = ""
+        }
+
+        guard let url = URL(string: model.smallImageURL) else {return}
+        
+        cellImageView.kf.setImage(with: url) { [weak self] result in
+            guard let self else { return }
+            
+            switch result {
+            case .success(let value):
+                self.imageState = .finished(value.image)
+                
+                let cacheType: String
+                switch value.cacheType {
+                case .none:
+                    cacheType = "Network"
+                case .memory:
+                    cacheType = "Memory"
+                case .disk:
+                    cacheType = "Disk"
+                }
+                
+                print("DEBUG",
+                      "Image loaded from - \(cacheType)",
+                      "Source - \(value.source)",
+                      separator: "\n")
+            case .failure(let error):
+                print("DEBUG",
+                      "[\(String(describing: self)).\(#function)]:",
+                      "Error loading image:",
+                      error.localizedDescription)
+                
+                self.imageState = .error
+            }
+        }
+        
+        dateLabel.text = stringDate
+        likeButton.tintColor = model.isLiked ? .ypRed : .ypWhiteAlpha50
+        likeButton.accessibilityIdentifier = model.isLiked ? "likeButtonIsLiked" : "likeButtonIsNotLiked"
     }
     
     func setIsLiked(_ isLiked: Bool) {
         likeButton.tintColor = isLiked ? .ypRed : .ypWhiteAlpha50
         likeButton.accessibilityIdentifier = isLiked ? "likeButtonIsLiked" : "likeButtonIsNotLiked"
     }
+    
+    // MARK: - Animations
+    func addLoadingAnimation() {
+        likeButton.isHidden = true
+        dateLabel.isHidden = true
+        gradientView.isHidden = true
+        layoutIfNeeded()
+        cellImageView.addLoadingLayer(radius: cellView.layer.cornerRadius)
+    }
+    
+    func removeLoadingAnimation() {
+        likeButton.isHidden = false
+        dateLabel.isHidden = false
+        gradientView.isHidden = false
+        layoutIfNeeded()
+        cellImageView.removeLoadingLayer()
+    }
 }
 
 private extension ImagesListCell {
+    // MARK: - Actions
+    @objc
+    func likeButtonClicked() {
+        delegate?.imageListCellDidTapLike(self)
+    }
     
     func setupUI() {
         contentView.backgroundColor = .ypBlack
@@ -104,16 +197,10 @@ private extension ImagesListCell {
         }
     }
     
-    // MARK: - Actions
-    @objc
-    func likeButtonClicked() {
-        delegate?.imageListCellDidTapLike(self)
-    }
-    
     // MARK: - Constraints
     func setupConstraints() {
         NSLayoutConstraint.activate([
-            cellView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 16),
+            cellView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             cellView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             cellView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
             cellView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),

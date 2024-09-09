@@ -9,30 +9,22 @@ import Foundation
 
 protocol ImagesListServiceProtocol {
     var photos: [Photo] { get }
-    static var shared: Self { get }
-    func fetchPhotosNextPage(request: URLRequest?,
-                             _ completion: @escaping (Result<String, Error>) -> Void)
+    func fetchPhotosNextPage(request: URLRequest?, _ completion: @escaping (Result<Void, Error>) -> Void)
     func changeLike(request: URLRequest?, photoId: String, _ completion: @escaping (Result<Void, Error>) -> Void)
-    func clearPhotosURL()
 }
 
 final class ImagesListService: ImagesListServiceProtocol {
     // MARK: - properties
-    static let shared = ImagesListService()
     static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
     
     private let urlSession = URLSession.shared
     private var fetchPhotosTask: URLSessionTask?
     private var changeLikeTask: URLSessionTask?
-    private let dateFormatter = DateConvertor.shared
     
     private(set) var photos = [Photo]()
     
-    private init() { }
-    
     // MARK: - Fetch photos
-    func fetchPhotosNextPage(request: URLRequest?,
-                             _ completion: @escaping (Result<String, Error>) -> Void) {
+    func fetchPhotosNextPage(request: URLRequest?, _ completion: @escaping (Result<Void, Error>) -> Void) {
         assert(Thread.isMainThread)
         
         guard fetchPhotosTask == nil else {
@@ -58,18 +50,17 @@ final class ImagesListService: ImagesListServiceProtocol {
                 DispatchQueue.main.async {
                     self.photos.append(contentsOf: photos)
                     NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
-                    self.fetchPhotosTask = nil
                 }
+                completion(.success(Void()))
             case .failure(let error):
                 print("DEBUG",
                       "[\(String(describing: self)).\(#function)]:",
                       "Error while fetching images:",
                       error.localizedDescription,
                       separator: "\n")
-                DispatchQueue.main.async {
-                    self.fetchPhotosTask = nil
-                }
+                completion(.failure(error))
             }
+            self.fetchPhotosTask = nil
         }
         self.fetchPhotosTask = task
         task.resume()
@@ -121,9 +112,5 @@ final class ImagesListService: ImagesListServiceProtocol {
         }
         changeLikeTask = task
         task.resume()
-    }
-    
-    func clearPhotosURL() {
-        photos.removeAll()
     }
 }

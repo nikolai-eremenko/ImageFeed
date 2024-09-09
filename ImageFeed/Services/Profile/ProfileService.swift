@@ -10,7 +10,6 @@ import WebKit
 import Kingfisher
 
 protocol ProfileServiceProtocol {
-    static var shared: Self { get }
     var profile: Profile? { get set}
     func fetchProfile(request: URLRequest?, completion: @escaping (Result<Profile, Error>) -> Void)
     func logout(_ vc: ProfileViewControllerProtocol)
@@ -18,16 +17,11 @@ protocol ProfileServiceProtocol {
 
 final class ProfileService: ProfileServiceProtocol {
     // MARK: - properties
-    static let shared = ProfileService()
-    
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     var profile: Profile?
     
-    // MARK: - Init
-    private init() { }
-    
-    // MARK: - Public methods
+    // MARK: - Fetch profile
     func fetchProfile(request: URLRequest?, completion: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread)
         task?.cancel()
@@ -66,23 +60,28 @@ final class ProfileService: ProfileServiceProtocol {
         task.resume()
     }
     
+    // MARK: - Logout
     func logout(_ vc: ProfileViewControllerProtocol) {
         vc.dismissView()
         
         UIBlockingProgressHUD.show()
         
         /// Wait for 3 seconds and then clean cookies
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            guard let self else { return }
+            
             UIBlockingProgressHUD.dismiss()
-            self.profile = nil
+            
             self.cleanCookies()
-            self.cleanUserData()
+            self.cleanToken()
+            self.cleanImageCache()
             self.switchToSplashScreen()
         }
     }
 }
 
 private extension ProfileService {
+    // MARK: - Clean user data
     func cleanCookies() {
         /// Очищаем все куки из хранилища
         HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
@@ -95,10 +94,11 @@ private extension ProfileService {
         }
     }
     
-    func cleanUserData() {
-        ProfileImageService.shared.clearProfileImageURL()
-        ImagesListService.shared.clearPhotosURL()
+    func cleanToken() {
         OAuth2TokenStorage.shared.removeTokenKey()
+    }
+    
+    func cleanImageCache() {
         ImageCache.default.clearMemoryCache()
         ImageCache.default.clearDiskCache()
     }

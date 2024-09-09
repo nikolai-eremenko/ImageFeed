@@ -115,7 +115,6 @@ final class ProfileViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        
         addLoadingAnimation()
         presenter?.viewDidAppear()
     }

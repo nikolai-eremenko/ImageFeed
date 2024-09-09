@@ -8,7 +8,6 @@
 import Foundation
 
 protocol ImagesListHelperProtocol {
-    
     func fetchPhotosNextPage()
     func getPhotosCount() -> Int
     func getPhoto(indexPath: IndexPath) -> Photo?
@@ -21,16 +20,14 @@ protocol ImagesListHelperProtocol {
 final class ImagesListHelper: ImagesListHelperProtocol {
     private let imagesListService: ImagesListServiceProtocol
     private let dateFormatter: DateConvertorProtocol
+    private var tokenStorage: OAuth2TokenStorageProtocol
     
     private var photos = [Photo]()
-    
     private var lastLoadedPage: Int = 0
     private var nextPage: Int = 0
     private let perPage: Int = 10
     
-    
-    private var tokenStorage: OAuth2TokenStorageProtocol
-    
+    // MARK: - Init
     init(imagesListService: ImagesListServiceProtocol,
          dateFormatter: DateConvertorProtocol,
          tokenStorage: OAuth2TokenStorageProtocol) {
@@ -39,27 +36,23 @@ final class ImagesListHelper: ImagesListHelperProtocol {
         self.tokenStorage = tokenStorage
     }
     
-    private func imagesListRequest() -> URLRequest?  {
-        guard let token = tokenStorage.token else { return nil }
-        
-        nextPage = lastLoadedPage + 1
-        
-        guard let request = Endpoint.getImages(token: token, page: nextPage, perPage: perPage).request else {
-            return nil
+    // MARK: - Fetch photos
+    func fetchPhotosNextPage() {
+        imagesListService.fetchPhotosNextPage(request: imagesListRequest()) { [weak self] result in
+            guard let self else { return }
+                
+            switch result {
+            case .success:
+                self.lastLoadedPage = self.nextPage
+            case .failure(let error):
+                // TODO: - Show error alert
+                print("DEBUG",
+                      "[\(String(describing: self)).\(#function)]:",
+                      "Error while fetching images:",
+                      error.localizedDescription,
+                      separator: "\n")
+            }
         }
-        
-        return request
-    }
-    
-    private func changeLikesRequest(photo: Photo) -> URLRequest? {
-        guard
-            let token = tokenStorage.token,
-            let request = Endpoint.changeLike(photoId: photo.id, isLike: photo.isLiked, token: token).request
-        else {
-            return nil
-        }
-        
-        return request
     }
     
     // MARK: - Like
@@ -87,31 +80,6 @@ final class ImagesListHelper: ImagesListHelperProtocol {
             }
         }
     }
-
-    func fetchPhotosNextPage() {
-        imagesListService.fetchPhotosNextPage(request: imagesListRequest()) { [weak self] result in
-            guard let self else { return }
-                
-            switch result {
-            case .success:
-                self.lastLoadedPage = self.nextPage
-            case .failure(let error):
-                print("DEBUG",
-                      "[\(String(describing: self)).\(#function)]:",
-                      "Error while fetching images:",
-                      error.localizedDescription,
-                      separator: "\n")
-            }
-        }
-    }
-    
-    func getPhotosCount() -> Int {
-        return photos.count
-    }
-    
-    func getPhoto(indexPath: IndexPath) -> Photo? {
-        return photos[safeIndex: indexPath.row]
-    }
     
     // MARK: - Insert rows
     func getInsertIndexPaths() -> [IndexPath]? {
@@ -134,5 +102,39 @@ final class ImagesListHelper: ImagesListHelperProtocol {
     
     func getStringFromDate(from date: Date) -> String {
         return dateFormatter.getStringFromDate(from: date)
+    }
+    
+    func getPhotosCount() -> Int {
+        return photos.count
+    }
+    
+    func getPhoto(indexPath: IndexPath) -> Photo? {
+        return photos[safeIndex: indexPath.row]
+    }
+}
+
+private extension ImagesListHelper {
+    // MARK: - Requests
+    private func imagesListRequest() -> URLRequest?  {
+        guard let token = tokenStorage.token else { return nil }
+        
+        nextPage = lastLoadedPage + 1
+        
+        guard let request = Endpoint.getImages(token: token, page: nextPage, perPage: perPage).request else {
+            return nil
+        }
+        
+        return request
+    }
+    
+    private func changeLikesRequest(photo: Photo) -> URLRequest? {
+        guard
+            let token = tokenStorage.token,
+            let request = Endpoint.changeLike(photoId: photo.id, isLike: photo.isLiked, token: token).request
+        else {
+            return nil
+        }
+        
+        return request
     }
 }

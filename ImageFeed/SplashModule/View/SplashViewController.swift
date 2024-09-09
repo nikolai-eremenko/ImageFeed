@@ -10,10 +10,9 @@ import UIKit
 final class SplashViewController: UIViewController {
     
     // MARK: - Properties
-    private let profileService = ProfileService.shared
-    private let imageService = ProfileImageService.shared
+    private let profileService = ProfileService()
+    private let imageService = ProfileImageService()
     private let storage = OAuth2TokenStorage.shared
-    private let oAuth2Service = OAuth2Service.shared
     
     // MARK: - UI Components
     private lazy var logoImageView: UIImageView = {
@@ -44,13 +43,12 @@ final class SplashViewController: UIViewController {
 private extension SplashViewController {
     // MARK: - Navigation
     func switchToAuthViewController() {
-        
         let authViewController = AuthViewController()
-        
         authViewController.delegate = self
         
         let navigationController = UINavigationController(rootViewController: authViewController)
         navigationController.modalPresentationStyle = .fullScreen
+        
         present(navigationController, animated: true)
     }
     

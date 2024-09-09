@@ -31,7 +31,7 @@ final class TabBarController: UITabBarController {
     private func setupTabs() {
         // MARK: - ImagesList Tab
         let imagesListViewController = ImagesListViewController()
-        let imagesListService = ImagesListService.shared
+        let imagesListService = ImagesListService()
         let dateFormatter = DateConvertor.shared
         let imagesHelper = ImagesListHelper(imagesListService: imagesListService,
                                             dateFormatter: dateFormatter,
@@ -47,8 +47,8 @@ final class TabBarController: UITabBarController {
         // MARK: - Profile Tab
         let profileViewController = ProfileViewController()
         let tokenStorage = OAuth2TokenStorage.shared
-        let profileService = ProfileService.shared
-        let profileImageService = ProfileImageService.shared
+        let profileService = ProfileService()
+        let profileImageService = ProfileImageService()
         let profileHelper = ProfileHelper(tokenStorage: tokenStorage,
                                           profileService: profileService,
                                           profileImageService: profileImageService)

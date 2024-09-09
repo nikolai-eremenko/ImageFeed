@@ -6,14 +6,12 @@
 //
 
 import UIKit
-import Kingfisher
 
 protocol ImagesListViewControllerProtocol: AnyObject, ImagesListCellDelegate {
     var presenter: ImagesListViewPresenterProtocol? { get set }
     func showLikeErrorAlert(model: AlertModel)
     func showSingleImage(vc: UIViewController)
     func tableViewInsertRows(at indexPaths: [IndexPath])
-    func configCell(for cell: ImagesListCell, with indexPath: IndexPath)
 }
 
 final class ImagesListViewController: UIViewController, ImagesListViewControllerProtocol {
@@ -38,55 +36,6 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
         setupUI()
         setupConstraints()
         presenter?.viewDidLoad()
-    }
-    
-    // MARK: - Cell
-    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        guard let photo = presenter?.getPhoto(indexPath: indexPath) else { return }
-        
-        let stringDate: String
-        
-        if let date = photo.createdAt {
-            stringDate = presenter?.getStringFromDate(from: date) ?? ""
-        } else {
-            stringDate = ""
-        }
-
-        guard let url = URL(string: photo.smallImageURL) else {return}
-        
-        cell.cellImageView.kf.indicatorType = .activity
-        cell.cellImageView.kf.setImage(with: url,
-                              placeholder: UIImage(named: "ic.scribble.variable"),
-                              options: [.transition(.fade(1))]) { [weak self] result in
-            guard let self else {return}
-            switch result {
-            case .success(let value):
-                cell.configure(image: value.image, date: stringDate, isLiked: photo.isLiked)
-                
-                let cacheType: String
-                switch value.cacheType {
-                case .none:
-                    cacheType = "Network"
-                case .memory:
-                    cacheType = "Memory"
-                case .disk:
-                    cacheType = "Disk"
-                }
-                
-                print("DEBUG",
-                      "Image loaded from - \(cacheType)",
-                      "Source - \(value.source)",
-                      separator: "\n")
-                
-            case .failure(let error):
-                print("DEBUG",
-                      "[\(String(describing: self)).\(#function)]:",
-                      "Error loading image:",
-                      error.localizedDescription)
-                guard let placeholder = UIImage(named: "ic.scribble.variable") else {return}
-                cell.configure(image: placeholder, date: stringDate, isLiked: photo.isLiked)
-            }
-        }
     }
     
     func tableViewInsertRows(at indexPaths: [IndexPath]) {
