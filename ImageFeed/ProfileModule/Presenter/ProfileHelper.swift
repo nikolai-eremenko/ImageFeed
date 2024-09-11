@@ -18,11 +18,18 @@ final class ProfileHelper: ProfileHelperProtocol {
     private let tokenStorage: OAuth2TokenStorageProtocol
     private let profileService: ProfileServiceProtocol
     private let profileImageService: ProfileImageServiceProtocol
+    private let configuration: Configuration
     
-    init(tokenStorage: OAuth2TokenStorageProtocol, profileService: ProfileServiceProtocol, profileImageService: ProfileImageServiceProtocol) {
+    init(
+        tokenStorage: OAuth2TokenStorageProtocol,
+        profileService: ProfileServiceProtocol,
+        profileImageService: ProfileImageServiceProtocol,
+        configuration: Configuration
+    ) {
         self.tokenStorage = tokenStorage
         self.profileService = profileService
         self.profileImageService = profileImageService
+        self.configuration = configuration
     }
     
     func isAuthorized() -> Bool {
@@ -32,7 +39,7 @@ final class ProfileHelper: ProfileHelperProtocol {
     private func profileRequest() -> URLRequest? {
         guard
             let token = tokenStorage.token,
-            let request = Endpoint.getProfile(token: token).request
+            let request = Endpoint.getProfile(config: configuration, token: token).request
         else {
             return nil
         }
@@ -43,7 +50,7 @@ final class ProfileHelper: ProfileHelperProtocol {
     private func profileImageRequest(username: String) -> URLRequest? {
         guard
             let token = tokenStorage.token,
-            let request = Endpoint.getProfileImage(token: token, username: username).request
+            let request = Endpoint.getProfileImage(config: configuration, token: token, username: username).request
         else {
             return nil
         }

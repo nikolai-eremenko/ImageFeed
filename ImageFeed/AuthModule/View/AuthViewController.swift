@@ -78,7 +78,8 @@ private extension AuthViewController {
     @objc
     func switchToWebViewController() {
         let webViewViewController = WebViewViewController()
-        let authHelper = AuthHelper()
+        let configuration = Configuration.standard
+        let authHelper = AuthHelper(configuration: configuration)
         let webViewPresenter = WebViewPresenter(authHelper: authHelper)
         
         webViewViewController.presenter = webViewPresenter

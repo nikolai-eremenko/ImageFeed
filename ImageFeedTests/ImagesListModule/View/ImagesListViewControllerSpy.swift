@@ -14,16 +14,11 @@ final class ImagesListViewControllerSpy: UIViewController, ImagesListViewControl
     
     var isShowSingleImageCalled = false
     var isTableViewInsertRowsCalled = false
-//    var receivedIndexPaths = [IndexPath]()
-    
-//    var isTableViewInsertRowsCalled = false
     
     // MARK: - Cell
-    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-    }
+    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) { }
     
     func tableViewInsertRows(at indexPaths: [IndexPath]) {
-//        receivedIndexPaths = indexPaths
         isTableViewInsertRowsCalled = true
     }
     
@@ -55,9 +50,7 @@ extension ImagesListViewControllerSpy: UITableViewDelegate {
         presenter?.didSelectImage(indexPath: indexPath)
     }
     
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-
-    }
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) { }
 }
 
 // MARK: - ImagesListCellDelegate

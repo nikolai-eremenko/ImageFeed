@@ -13,12 +13,17 @@ protocol AuthHelperProtocol {
 }
 
 final class AuthHelper: AuthHelperProtocol {
+    private let configuration: Configuration
+    
+    init(configuration: Configuration) {
+        self.configuration = configuration
+    }
     
     func authRequest() -> URLRequest? {
-        guard let request = Endpoint.authorize().request else {
+        guard let request = Endpoint.authorize(config: configuration).request else {
             return nil
         }
-
+        
         return request
     }
     

@@ -22,10 +22,7 @@ enum NetworkError: Error {
 }
 
 extension URLSession {
-    func data(
-        for request: URLRequest,
-        completion: @escaping (Result<Data, Error>) -> Void
-    ) -> URLSessionTask {
+    func data(for request: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionTask {
         let fulfillCompletionOnTheMainThread: (Result<Data, Error>) -> Void = { result in
             DispatchQueue.main.async {
                 completion(result)
@@ -33,14 +30,9 @@ extension URLSession {
         }
         
         let task = dataTask(with: request, completionHandler: { data, response, error in
-            if let data = data, let response = response, let statusCode = (response as? HTTPURLResponse)?.statusCode/*, let headers = (response as? HTTPURLResponse)?.allHeaderFields*/ {
+            if let data = data, let response = response, let statusCode = (response as? HTTPURLResponse)?.statusCode {
                 switch statusCode {
                 case 200...299:
-//                    print("DEBUG",
-//                          "[\(String(describing: self)).\(#function)]:",
-//                          "- code: \(statusCode)",
-////                          "- headers: \(headers)",
-//                          separator: "\n")
                     fulfillCompletionOnTheMainThread(.success(data))
                 case 400:
                     print("DEBUG",

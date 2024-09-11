@@ -66,8 +66,7 @@ final class ImagesListViewPresenter: NSObject, ImagesListViewPresenterProtocol {
     func getPhoto(indexPath: IndexPath) -> Photo? {
         return imagesHelper.getPhoto(indexPath: indexPath)
     }
-    
-    // MARK: - Insert rows
+
     func updateTableViewAnimated() {
         guard let indexPaths = imagesHelper.getInsertIndexPaths() else { return }
         

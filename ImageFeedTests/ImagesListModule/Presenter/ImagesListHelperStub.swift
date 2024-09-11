@@ -1,25 +1,16 @@
 //
-//  ImagesListHelper.swift
-//  ImageFeed
+//  ImagesListHelperStub.swift
+//  ImageFeedTests
 //
-//  Created by Nikolai Eremenko on 22.08.2024.
+//  Created by Nikolai Eremenko on 10.09.2024.
 //
 
 import Foundation
+@testable import ImageFeed
 
-protocol ImagesListHelperProtocol {
-    func fetchPhotosNextPage()
-    func getPhotosCount() -> Int
-    func getPhoto(indexPath: IndexPath) -> Photo?
-    func getInsertIndexPaths() -> [IndexPath]?
-    func changeLike(indexPath: IndexPath, _ completion: @escaping (Result<Bool, Error>) -> Void)
-    func getImageStringURL(indexPath: IndexPath) -> String?
-}
-
-final class ImagesListHelper: ImagesListHelperProtocol {
+final class ImagesListHelperStub: ImagesListHelperProtocol {
     private let imagesListService: ImagesListServiceProtocol
     private var tokenStorage: OAuth2TokenStorageProtocol
-    private let configuration: Configuration
     
     private var photos = [Photo]()
     private var lastLoadedPage: Int = 0
@@ -27,14 +18,10 @@ final class ImagesListHelper: ImagesListHelperProtocol {
     private let perPage: Int = 10
     
     // MARK: - Init
-    init(
-        imagesListService: ImagesListServiceProtocol,
-         tokenStorage: OAuth2TokenStorageProtocol,
-         configuration: Configuration
-    ) {
+    init(imagesListService: ImagesListServiceProtocol,
+         tokenStorage: OAuth2TokenStorageProtocol) {
         self.imagesListService = imagesListService
         self.tokenStorage = tokenStorage
-        self.configuration = configuration
     }
     
     // MARK: - Fetch photos
@@ -44,7 +31,6 @@ final class ImagesListHelper: ImagesListHelperProtocol {
                 
             switch result {
             case .success:
-                self.photos = self.imagesListService.photos
                 self.lastLoadedPage = self.nextPage
             case .failure(let error):
                 // TODO: - Show error alert
@@ -111,14 +97,14 @@ final class ImagesListHelper: ImagesListHelperProtocol {
     }
 }
 
-private extension ImagesListHelper {
+private extension ImagesListHelperStub {
     // MARK: - Requests
     private func imagesListRequest() -> URLRequest?  {
         guard let token = tokenStorage.token else { return nil }
         
         nextPage = lastLoadedPage + 1
         
-        guard let request = Endpoint.getImages(config: configuration, token: token, page: nextPage, perPage: perPage).request else {
+        guard let request = Endpoint.getImages(config: .mock, token: token, page: nextPage, perPage: perPage).request else {
             return nil
         }
         
@@ -128,7 +114,7 @@ private extension ImagesListHelper {
     private func changeLikesRequest(photo: Photo) -> URLRequest? {
         guard
             let token = tokenStorage.token,
-            let request = Endpoint.changeLike(config: configuration, photoId: photo.id, isLike: photo.isLiked, token: token).request
+            let request = Endpoint.changeLike(config: .mock, photoId: photo.id, isLike: photo.isLiked, token: token).request
         else {
             return nil
         }

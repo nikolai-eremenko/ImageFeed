@@ -33,7 +33,8 @@ final class TabBarController: UITabBarController {
         let imagesListViewController = ImagesListViewController()
         let imagesListService = ImagesListService()
         let imagesHelper = ImagesListHelper(imagesListService: imagesListService,
-                                            tokenStorage: OAuth2TokenStorage.shared)
+                                            tokenStorage: OAuth2TokenStorage.shared,
+                                            configuration: Configuration.standard)
         let imagesListViewPresenter = ImagesListViewPresenter(view: imagesListViewController,
                                                               imagesHelper: imagesHelper)
         imagesListViewController.presenter = imagesListViewPresenter
@@ -47,9 +48,11 @@ final class TabBarController: UITabBarController {
         let tokenStorage = OAuth2TokenStorage.shared
         let profileService = ProfileService()
         let profileImageService = ProfileImageService()
+        let configuration = Configuration.standard
         let profileHelper = ProfileHelper(tokenStorage: tokenStorage,
                                           profileService: profileService,
-                                          profileImageService: profileImageService)
+                                          profileImageService: profileImageService,
+                                          configuration: configuration)
         let profileViewPresenter = ProfileViewPresenter(view: profileViewController,
                                                         profileHelper: profileHelper)
         profileViewController.presenter = profileViewPresenter

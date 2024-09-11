@@ -9,28 +9,34 @@ import XCTest
 @testable import ImageFeed
 
 final class ImagesListViewTests: XCTestCase {
-    var imagesListService: ImagesListService!
-    var dateFormatter: DateConvertor!
-    var imagesHelper: ImagesListHelper!
-    var presenter: ImagesListViewPresenter!
+    var imagesListService: ImagesListServiceProtocol!
+    var dateFormatter: DateConvertorProtocol!
+    var imagesHelper: ImagesListHelperProtocol!
+    var presenter: ImagesListViewPresenterProtocol!
     var viewController: ImagesListViewController!
     var tokenStorage: OAuth2TokenStorageProtocol!
+    var configuration: Configuration!
 
     override func setUpWithError() throws {
-        imagesListService = ImagesListService()
+        imagesListService = ImagesListServiceFake()
         dateFormatter = DateConvertor.shared
-        tokenStorage = OAuth2TokenStorage.shared
-        imagesHelper = ImagesListHelper(imagesListService: imagesListService, tokenStorage: tokenStorage)
+        tokenStorage = OAuth2TokenStorageStub.shared
+        configuration = Configuration.mock
+        imagesHelper = ImagesListHelper(imagesListService: imagesListService,
+                                        tokenStorage: tokenStorage,
+                                        configuration: configuration)
         viewController = ImagesListViewController()
-        presenter = ImagesListViewPresenter(view: viewController, imagesHelper: imagesHelper)
+        presenter = ImagesListViewPresenter(view: viewController,
+                                            imagesHelper: imagesHelper)
     }
 
     override func tearDownWithError() throws {
         imagesListService = nil
         dateFormatter = nil
         imagesHelper = nil
-        viewController = nil
         presenter = nil
+        viewController = nil
+        tokenStorage = nil
     }
    
     //MARK: - ViewControllerCalls
@@ -80,10 +86,12 @@ final class ImagesListViewTests: XCTestCase {
         let indexPath = IndexPath(row: 2, section: 0)
         
         //when
-        viewController.loadViewIfNeeded()
-        _ = presenter.getPhoto(indexPath: indexPath)
+        presenter.fetchPhotosNextPage()
+
+        let photo = presenter.getPhoto(indexPath: indexPath)
         
         //then
+        XCTAssertEqual(photo?.id, "Foo")
         XCTAssertTrue(presenter.isGetPhotoCalled)
     }
     

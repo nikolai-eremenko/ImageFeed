@@ -18,7 +18,7 @@ protocol ProfileViewControllerProtocol: AnyObject {
     func failureProfileImage(error: Error)
 }
 
-final class ProfileViewController: UIViewController {
+final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
     var presenter: ProfileViewPresenterProtocol?
     
     //MARK: - UI Components
@@ -123,81 +123,7 @@ final class ProfileViewController: UIViewController {
     func showLogoutAlert(model: AlertModel) {
         AlertPresenter.showAlert(on: self, model: model)
     }
-}
-
-private extension ProfileViewController {
-    func updateProfileWithPlaceholder() {
-        let placeHolderProfile = Profile(username: "Екатерина", name: "Новикова", loginName: "@ekaterina_nov", bio: "Hello, world!")
-        updateProfileDetails(with: placeHolderProfile)
-    }
     
-    //MARK: - Animations
-    func addLoadingAnimation() {
-        profilePhotoImageView.addLoadingLayer(radius: profilePhotoImageView.frame.width/2)
-        
-        nameAnimationView.addLoadingLayer(radius: nameAnimationView.frame.height/2)
-        nickAnimationView.addLoadingLayer(radius: nickAnimationView.frame.height/2)
-        aboutAnimationView.addLoadingLayer(radius: aboutAnimationView.frame.height/2)
-    }
-    
-    func removeLoadingAnimation() {
-        nameAnimationView.removeLoadingLayer()
-        nickAnimationView.removeLoadingLayer()
-        aboutAnimationView.removeLoadingLayer()
-        
-        nameAnimationView.removeFromSuperview()
-        nickAnimationView.removeFromSuperview()
-        aboutAnimationView.removeFromSuperview()
-    }
-    
-    //MARK: - Actions
-    @objc
-    func logoutAction() {
-        presenter?.didTapLogoutButton()
-    }
-    
-    // MARK: - Constraints
-    func setupViews() {
-        view.backgroundColor = .ypBlack
-        view.addSubview(profileStackView)
-        profileStackView.translatesAutoresizingMaskIntoConstraints = false
-        profileStackView.addArrangedSubview(headerStackView)
-        profileStackView.addArrangedSubview(fullNameLabel)
-        profileStackView.addArrangedSubview(nickNameLabel)
-        profileStackView.addArrangedSubview(aboutLabel)
-        headerStackView.addArrangedSubview(profilePhotoImageView)
-        headerStackView.addArrangedSubview(logoutButton)
-        
-        fullNameLabel.addSubview(nameAnimationView)
-        nickNameLabel.addSubview(nickAnimationView)
-        aboutLabel.addSubview(aboutAnimationView)
-        
-        setupConstraints()
-    }
-    
-    func setupConstraints() {
-        NSLayoutConstraint.activate([
-            profileStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            profileStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            profileStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            profilePhotoImageView.widthAnchor.constraint(equalToConstant: 70),
-            profilePhotoImageView.heightAnchor.constraint(equalToConstant: 70),
-            
-            fullNameLabel.heightAnchor.constraint(equalToConstant: 18),
-            nickNameLabel.heightAnchor.constraint(equalToConstant: 18),
-            aboutLabel.heightAnchor.constraint(equalToConstant: 18),
-            
-            nameAnimationView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.6),
-            nameAnimationView.heightAnchor.constraint(equalToConstant: 18),
-            nickAnimationView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.24),
-            nickAnimationView.heightAnchor.constraint(equalToConstant: 18),
-            aboutAnimationView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.16),
-            aboutAnimationView.heightAnchor.constraint(equalToConstant: 18)
-        ])
-    }
-}
-
-extension ProfileViewController: ProfileViewControllerProtocol {
     // MARK: - Profile
     func updateProfileDetails(with model: Profile) {
         fullNameLabel.text = model.name
@@ -276,6 +202,78 @@ extension ProfileViewController: ProfileViewControllerProtocol {
     // MARK: - Dismiss View
     func dismissView() {
         dismiss(animated: true)
+    }
+}
+
+private extension ProfileViewController {
+    func updateProfileWithPlaceholder() {
+        let placeHolderProfile = Profile(username: "Екатерина", name: "Новикова", loginName: "@ekaterina_nov", bio: "Hello, world!")
+        updateProfileDetails(with: placeHolderProfile)
+    }
+    
+    //MARK: - Animations
+    func addLoadingAnimation() {
+        profilePhotoImageView.addLoadingLayer(radius: profilePhotoImageView.frame.width/2)
+        
+        nameAnimationView.addLoadingLayer(radius: nameAnimationView.frame.height/2)
+        nickAnimationView.addLoadingLayer(radius: nickAnimationView.frame.height/2)
+        aboutAnimationView.addLoadingLayer(radius: aboutAnimationView.frame.height/2)
+    }
+    
+    func removeLoadingAnimation() {
+        nameAnimationView.removeLoadingLayer()
+        nickAnimationView.removeLoadingLayer()
+        aboutAnimationView.removeLoadingLayer()
+        
+        nameAnimationView.removeFromSuperview()
+        nickAnimationView.removeFromSuperview()
+        aboutAnimationView.removeFromSuperview()
+    }
+    
+    //MARK: - Actions
+    @objc
+    func logoutAction() {
+        presenter?.didTapLogoutButton()
+    }
+    
+    // MARK: - Constraints
+    func setupViews() {
+        view.backgroundColor = .ypBlack
+        view.addSubview(profileStackView)
+        profileStackView.translatesAutoresizingMaskIntoConstraints = false
+        profileStackView.addArrangedSubview(headerStackView)
+        profileStackView.addArrangedSubview(fullNameLabel)
+        profileStackView.addArrangedSubview(nickNameLabel)
+        profileStackView.addArrangedSubview(aboutLabel)
+        headerStackView.addArrangedSubview(profilePhotoImageView)
+        headerStackView.addArrangedSubview(logoutButton)
+        
+        fullNameLabel.addSubview(nameAnimationView)
+        nickNameLabel.addSubview(nickAnimationView)
+        aboutLabel.addSubview(aboutAnimationView)
+        
+        setupConstraints()
+    }
+    
+    func setupConstraints() {
+        NSLayoutConstraint.activate([
+            profileStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            profileStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            profileStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            profilePhotoImageView.widthAnchor.constraint(equalToConstant: 70),
+            profilePhotoImageView.heightAnchor.constraint(equalToConstant: 70),
+            
+            fullNameLabel.heightAnchor.constraint(equalToConstant: 18),
+            nickNameLabel.heightAnchor.constraint(equalToConstant: 18),
+            aboutLabel.heightAnchor.constraint(equalToConstant: 18),
+            
+            nameAnimationView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.6),
+            nameAnimationView.heightAnchor.constraint(equalToConstant: 18),
+            nickAnimationView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.24),
+            nickAnimationView.heightAnchor.constraint(equalToConstant: 18),
+            aboutAnimationView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.16),
+            aboutAnimationView.heightAnchor.constraint(equalToConstant: 18)
+        ])
     }
 }
 
