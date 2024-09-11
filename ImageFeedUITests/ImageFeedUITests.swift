@@ -55,23 +55,22 @@ final class ImageFeedUITests: XCTestCase {
     /// тестируем сценарий ленты
     func testFeed() throws {
         let tablesQuery = app.tables
-        
+
         let cell = tablesQuery.children(matching: .cell).element(boundBy: 0)
-        cell.swipeUp()
         
-        sleep(4)
+        cell.swipeUp(velocity: .fast)
+        sleep(3)
         
         let cellToLike = tablesQuery.children(matching: .cell).element(boundBy: 1)
         
         cellToLike.buttons["likeButtonIsNotLiked"].tap()
-        sleep(2)
+        sleep(3)
         cellToLike.buttons["likeButtonIsLiked"].tap()
         
         sleep(3)
         
         cellToLike.tap()
-        
-        sleep(3)
+        sleep(4)
         
         let image = app.scrollViews.images.element(boundBy: 0)
         image.pinch(withScale: 3, velocity: 1)
@@ -83,15 +82,16 @@ final class ImageFeedUITests: XCTestCase {
     
     /// тестируем сценарий профиля
     func testProfile() throws {
-        sleep(5)
         app.tabBars.buttons.element(boundBy: 1).tap()
         
         sleep(5)
         XCTAssertTrue(app.staticTexts[""].exists)     // add your "Name Surname"
-        XCTAssertTrue(app.staticTexts["@"].exists)    // add your "@username"
+        XCTAssertTrue(app.staticTexts[""].exists)    // add your "@username"
         
         app.buttons["logoutButton"].tap()
         
         app.alerts["Logout"].scrollViews.otherElements.buttons["Да"].tap()
+        
+        XCTAssertTrue(app.buttons["Authenticate"].waitForExistence(timeout: 3))
     }
 }
