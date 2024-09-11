@@ -18,9 +18,9 @@ final class ProfileViewTests: XCTestCase {
     var configuration: Configuration!
     
     override func setUpWithError() throws {
-        tokenStorage = OAuth2TokenStorage.shared
-        profileService = ProfileService()
-        profileImageService = ProfileImageService()
+        tokenStorage = OAuth2TokenStorageStub.shared
+        profileService = ProfileServiceFake()
+        profileImageService = ProfileImageServiceFake()
         configuration = Configuration.mock
         profileHelper = ProfileHelper(tokenStorage: tokenStorage,
                                       profileService: profileService,
@@ -39,18 +39,6 @@ final class ProfileViewTests: XCTestCase {
         profileHelper = nil
     }
     
-    func testViewControllerCallsPresenterViewDidLoad() {
-        //given
-        let presenter = ProfileViewPresenterSpy(view: viewController, profileHelper: profileHelper)
-        viewController.presenter = presenter
-        
-        //when
-        viewController.loadViewIfNeeded()
-        
-        //then
-        XCTAssertTrue(presenter.isViewDidLoadCalled)
-    }
-    
     func testViewControllerCallsPresenterViewDidAppear() {
         //given
         let presenter = ProfileViewPresenterSpy(view: viewController, profileHelper: profileHelper)
@@ -61,7 +49,11 @@ final class ProfileViewTests: XCTestCase {
         viewController.viewDidAppear(true)
         
         //then
-        XCTAssertTrue(presenter.isViewDidAppearCalled)
+        XCTAssertEqual(presenter.profile?.username, "Foo")
+        XCTAssertEqual(presenter.profile?.name, "Baz")
+        XCTAssertEqual(presenter.profile?.loginName, "Bar")
+        XCTAssertEqual(presenter.profile?.bio, "Quux")
+        XCTAssertEqual(presenter.profileImageURL, "Quuuux")
     }
     
     func testViewControllerCallsPresenterDidTapLogoutButton() {

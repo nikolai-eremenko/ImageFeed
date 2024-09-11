@@ -1,60 +1,24 @@
 //
-//  ProfileService.swift
-//  ImageFeed
+//  ProfileServiceFake.swift
+//  ImageFeedTests
 //
-//  Created by Nikolai Eremenko on 19.07.2024.
+//  Created by Nikolai Eremenko on 12.09.2024.
 //
 
 import Foundation
 import WebKit
 import Kingfisher
+@testable import ImageFeed
 
-protocol ProfileServiceProtocol {
-    var profile: Profile? { get set}
-    func fetchProfile(request: URLRequest?, completion: @escaping (Result<Profile, Error>) -> Void)
-    func logout(_ vc: ProfileViewControllerProtocol)
-}
-
-final class ProfileService: ProfileServiceProtocol {
+final class ProfileServiceFake: ProfileServiceProtocol {
     // MARK: - properties
-    private let urlSession = URLSession.shared
-    private var task: URLSessionTask?
     var profile: Profile?
     
     // MARK: - Fetch profile
     func fetchProfile(request: URLRequest?, completion: @escaping (Result<Profile, Error>) -> Void) {
-        assert(Thread.isMainThread)
-        task?.cancel()
-        
-        guard let request else {
-            completion(.failure(NetworkError.invalidRequest))
-            fatalError("cannot create URL")
-        }
-        
-        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
-            guard let self = self else { return }
-            
-            print("PROFILE REQUEST: \(request)")
-            
-            switch result {
-            case .success(let object):
-                let profile = Profile(from: object)
-                completion(.success(profile))
-                DispatchQueue.main.async {
-                    self.profile = profile
-                }
-            case .failure(let error):
-                print("DEBUG",
-                      "[\(String(describing: self)).\(#function)]:",
-                      "Error while fetching profile:",
-                      error.localizedDescription,
-                      separator: "\n")
-                completion(.failure(error))
-            }
-            self.task = nil
-        }
-        self.task = task
-        task.resume()
+        let profile = Profile(username: "Foo", name: "Baz", loginName: "Bar", bio: "Quux")
+        self.profile = profile
+        completion(.success(profile))
     }
     
     // MARK: - Logout
@@ -77,7 +41,7 @@ final class ProfileService: ProfileServiceProtocol {
     }
 }
 
-private extension ProfileService {
+private extension ProfileServiceFake {
     // MARK: - Clean user data
     func cleanCookies() {
         HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)

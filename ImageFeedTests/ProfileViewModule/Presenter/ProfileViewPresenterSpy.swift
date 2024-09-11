@@ -12,8 +12,10 @@ final class ProfileViewPresenterSpy: ProfileViewPresenterProtocol {
     weak var view: ProfileViewControllerProtocol?
     private let profileHelper: ProfileHelperProtocol
     
-    var isViewDidLoadCalled: Bool = false
     var isViewDidAppearCalled: Bool = false
+    var profile: Profile? = nil
+    var profileImageURL: String? = nil
+    
     var isDidTapLogoutButtonCalled: Bool = false
     
     init(
@@ -24,15 +26,8 @@ final class ProfileViewPresenterSpy: ProfileViewPresenterProtocol {
         self.profileHelper = profileHelper
     }
     
-    func viewDidLoad() {
-        if !profileHelper.isAuthorized() {
-            switchToSplashScreen()
-        }
-        
-        isViewDidLoadCalled = true
-    }
-    
     func viewDidAppear() {
+        fetchProfile()
         isViewDidAppearCalled = true
     }
     
@@ -74,10 +69,6 @@ private extension ProfileViewPresenterSpy {
         return model
     }
     
-    // MARK: - Navigation
-    func switchToSplashScreen() {
-    }
-    
     // MARK: - Fetching
     func fetchProfile() {
         profileHelper.fetchProfile { [weak self] result in
@@ -86,7 +77,7 @@ private extension ProfileViewPresenterSpy {
             switch result {
             case .success(let profile):
                 self.fetchProfileImageURL(username: profile.username)
-                self.view?.updateProfileDetails(with: profile)
+                self.profile = profile
             case .failure(let error):
                 self.view?.failureProfileDetails(error: error)
             }
@@ -99,7 +90,7 @@ private extension ProfileViewPresenterSpy {
             
             switch result {
             case .success(let imageStringURL):
-                self.view?.updateProfileImage(with: imageStringURL)
+                self.profileImageURL = imageStringURL
             case .failure(let error):
                 self.view?.failureProfileImage(error: error)
             }

@@ -10,7 +10,6 @@ import UIKit
 protocol ProfileViewPresenterProtocol {
     var view: ProfileViewControllerProtocol? { get set }
     func didTapLogoutButton()
-    func viewDidLoad()
     func viewDidAppear()
 }
 
@@ -26,12 +25,6 @@ final class ProfileViewPresenter: ProfileViewPresenterProtocol {
         self.profileHelper = profileHelper
     }
     
-    func viewDidLoad() {
-        if !profileHelper.isAuthorized() {
-            switchToSplashScreen()
-        }
-    }
-    
     func viewDidAppear() {
         fetchProfile()
     }
@@ -39,11 +32,9 @@ final class ProfileViewPresenter: ProfileViewPresenterProtocol {
     func didTapLogoutButton() {
         view?.showLogoutAlert(model: getLogoutAlert())
     }
-}
-
-private extension ProfileViewPresenter {
+    
     // MARK: - Alert
-    func getLogoutAlert() -> AlertModel {
+    private func getLogoutAlert() -> AlertModel {
         let model = AlertModel(
             title: "Пока, пока!",
             message: "Уверенные что хотите выйти?",
@@ -63,18 +54,20 @@ private extension ProfileViewPresenter {
     }
     
     // MARK: - Navigation
-    func switchToSplashScreen() {
-        guard let window = UIApplication.shared.windows.first else {
-            assertionFailure("Invalid window configuration")
-            return
-        }
-        window.rootViewController = SplashViewController()
-        window.makeKeyAndVisible()
-        UIView.transition(with: window, duration: 0.3, options: [.transitionCrossDissolve], animations: nil, completion: nil)
-    }
+//    private func switchToSplashScreen() {
+//        if !profileHelper.isAuthorized() {
+//            guard let window = UIApplication.shared.windows.first else {
+//                assertionFailure("Invalid window configuration")
+//                return
+//            }
+//            window.rootViewController = SplashViewController()
+//            window.makeKeyAndVisible()
+//            UIView.transition(with: window, duration: 0.3, options: [.transitionCrossDissolve], animations: nil, completion: nil)
+//        }
+//    }
     
     // MARK: - Fetching
-    func fetchProfile() {
+    private func fetchProfile() {
         profileHelper.fetchProfile { [weak self] result in
             guard let self else { return }
             
@@ -88,7 +81,7 @@ private extension ProfileViewPresenter {
         }
     }
     
-    func fetchProfileImageURL(username: String) {
+    private func fetchProfileImageURL(username: String) {
         profileHelper.fetchProfileImageURL(username: username) { [weak self] result in
             guard let self else { return }
             

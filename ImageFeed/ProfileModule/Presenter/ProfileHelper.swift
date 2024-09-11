@@ -11,7 +11,6 @@ protocol ProfileHelperProtocol {
     func fetchProfile(_ completion: @escaping (Result<Profile, Error>) -> Void)
     func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void)
     func clearUserData(vc: ProfileViewControllerProtocol)
-    func isAuthorized() -> Bool
 }
 
 final class ProfileHelper: ProfileHelperProtocol {
@@ -30,32 +29,6 @@ final class ProfileHelper: ProfileHelperProtocol {
         self.profileService = profileService
         self.profileImageService = profileImageService
         self.configuration = configuration
-    }
-    
-    func isAuthorized() -> Bool {
-        tokenStorage.token != nil
-    }
-    
-    private func profileRequest() -> URLRequest? {
-        guard
-            let token = tokenStorage.token,
-            let request = Endpoint.getProfile(config: configuration, token: token).request
-        else {
-            return nil
-        }
-        
-        return request
-    }
-    
-    private func profileImageRequest(username: String) -> URLRequest? {
-        guard
-            let token = tokenStorage.token,
-            let request = Endpoint.getProfileImage(config: configuration, token: token, username: username).request
-        else {
-            return nil
-        }
-        
-        return request
     }
     
     func fetchProfile(_ completion: @escaping (Result<Profile, Error>) -> Void) {
@@ -106,5 +79,28 @@ final class ProfileHelper: ProfileHelperProtocol {
     
     func clearUserData(vc: ProfileViewControllerProtocol) {
         profileService.logout(vc)
+    }
+    
+    // MARK: - Requests
+    private func profileRequest() -> URLRequest? {
+        guard
+            let token = tokenStorage.token,
+            let request = Endpoint.getProfile(config: configuration, token: token).request
+        else {
+            return nil
+        }
+        
+        return request
+    }
+    
+    private func profileImageRequest(username: String) -> URLRequest? {
+        guard
+            let token = tokenStorage.token,
+            let request = Endpoint.getProfileImage(config: configuration, token: token, username: username).request
+        else {
+            return nil
+        }
+        
+        return request
     }
 }

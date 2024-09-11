@@ -108,7 +108,6 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        presenter?.viewDidLoad()
         setupViews()
     }
     
@@ -206,11 +205,6 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
 }
 
 private extension ProfileViewController {
-    func updateProfileWithPlaceholder() {
-        let placeHolderProfile = Profile(username: "Екатерина", name: "Новикова", loginName: "@ekaterina_nov", bio: "Hello, world!")
-        updateProfileDetails(with: placeHolderProfile)
-    }
-    
     //MARK: - Animations
     func addLoadingAnimation() {
         profilePhotoImageView.addLoadingLayer(radius: profilePhotoImageView.frame.width/2)

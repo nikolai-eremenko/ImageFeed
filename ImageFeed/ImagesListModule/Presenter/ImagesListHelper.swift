@@ -109,9 +109,7 @@ final class ImagesListHelper: ImagesListHelperProtocol {
     func getPhoto(indexPath: IndexPath) -> Photo? {
         return photos[safeIndex: indexPath.row]
     }
-}
-
-private extension ImagesListHelper {
+    
     // MARK: - Requests
     private func imagesListRequest() -> URLRequest?  {
         guard let token = tokenStorage.token else { return nil }

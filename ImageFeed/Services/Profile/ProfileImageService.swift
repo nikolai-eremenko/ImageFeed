@@ -12,7 +12,6 @@ protocol ProfileImageServiceProtocol {
 }
 
 final class ProfileImageService: ProfileImageServiceProtocol {
-    private let storage = OAuth2TokenStorage.shared
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     var avatarURL: String?
@@ -32,13 +31,8 @@ final class ProfileImageService: ProfileImageServiceProtocol {
             switch result {
             case .success(let object):
                 let profileImageURL = object.profileImage.large
-                completion(.success(profileImageURL))
-                
                 self.avatarURL = profileImageURL
-                
-                DispatchQueue.main.async {
-                    self.task = nil
-                }
+                completion(.success(profileImageURL))
             case .failure(let error):
                 print("DEBUG",
                       "[\(String(describing: self)).\(#function)]:",
@@ -47,10 +41,8 @@ final class ProfileImageService: ProfileImageServiceProtocol {
                       separator: "\n")
                 
                 completion(.failure(error))
-                DispatchQueue.main.async {
-                    self.task = nil
-                }
             }
+            self.task = nil
         }
         self.task = task
         task.resume()
