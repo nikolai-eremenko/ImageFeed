@@ -28,15 +28,15 @@ final class ImageFeedUITests: XCTestCase {
         XCTAssertTrue(loginTextField.waitForExistence(timeout: 5))
         
         loginTextField.tap()
-        loginTextField.typeText("")    // add your email
-        webView.swipeUp()
+        loginTextField.typeText("") // add your email
+        
+        app.toolbars.buttons["Next"].tap()
         
         let passwordTextField = webView.descendants(matching: .secureTextField).element
         XCTAssertTrue(passwordTextField.waitForExistence(timeout: 5))
         
-        passwordTextField.tap()
         passwordTextField.typeText("")  // add your password
-        webView.swipeUp()
+        app.toolbars.buttons["Done"].tap()
         
         webView.buttons["Login"].tap()
         
@@ -56,12 +56,9 @@ final class ImageFeedUITests: XCTestCase {
     func testFeed() throws {
         let tablesQuery = app.tables
 
-        let cell = tablesQuery.children(matching: .cell).element(boundBy: 0)
-        
-        cell.swipeUp(velocity: .fast)
         sleep(3)
         
-        let cellToLike = tablesQuery.children(matching: .cell).element(boundBy: 1)
+        let cellToLike = tablesQuery.children(matching: .cell).element(boundBy: 0)
         
         cellToLike.buttons["likeButtonIsNotLiked"].tap()
         sleep(3)
@@ -86,7 +83,7 @@ final class ImageFeedUITests: XCTestCase {
         
         sleep(5)
         XCTAssertTrue(app.staticTexts[""].exists)     // add your "Name Surname"
-        XCTAssertTrue(app.staticTexts[""].exists)    // add your "@username"
+        XCTAssertTrue(app.staticTexts["@"].exists)    // add your "@username"
         
         app.buttons["logoutButton"].tap()
         
