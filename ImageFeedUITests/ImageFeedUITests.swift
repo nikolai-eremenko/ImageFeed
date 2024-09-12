@@ -55,21 +55,23 @@ final class ImageFeedUITests: XCTestCase {
     /// тестируем сценарий ленты
     func testFeed() throws {
         let tablesQuery = app.tables
-
-        sleep(3)
+        let cell = tablesQuery.children(matching: .cell).element(boundBy: 0)
+        XCTAssertTrue(cell.waitForExistence(timeout: 5))
+        
+        app.swipeUp()
+        app.swipeDown()
         
         let cellToLike = tablesQuery.children(matching: .cell).element(boundBy: 0)
         
         cellToLike.buttons["likeButtonIsNotLiked"].tap()
         sleep(3)
         cellToLike.buttons["likeButtonIsLiked"].tap()
-        
         sleep(3)
         
         cellToLike.tap()
-        sleep(4)
         
         let image = app.scrollViews.images.element(boundBy: 0)
+        XCTAssertTrue(image.waitForExistence(timeout: 5))
         image.pinch(withScale: 3, velocity: 1)
         image.pinch(withScale: 0.5, velocity: -1)
         
