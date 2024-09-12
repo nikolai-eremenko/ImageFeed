@@ -6,11 +6,13 @@
 //
 
 import Foundation
+import WebKit
+import Kingfisher
 
 protocol ProfileHelperProtocol {
     func fetchProfile(_ completion: @escaping (Result<Profile, Error>) -> Void)
     func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void)
-    func clearUserData(vc: ProfileViewControllerProtocol)
+    func clearUserData()
 }
 
 final class ProfileHelper: ProfileHelperProtocol {
@@ -77,8 +79,29 @@ final class ProfileHelper: ProfileHelperProtocol {
         }
     }
     
-    func clearUserData(vc: ProfileViewControllerProtocol) {
-        profileService.logout(vc)
+    // MARK: - Clean user data
+    func clearUserData() {
+        cleanCookies()
+        cleanToken()
+        cleanImageCache()
+    }
+    
+    private func cleanCookies() {
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+        WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+            records.forEach { record in
+                WKWebsiteDataStore.default().removeData(ofTypes: record.dataTypes, for: [record], completionHandler: {})
+            }
+        }
+    }
+    
+    private func cleanToken() {
+        tokenStorage.removeTokenKey()
+    }
+    
+    private func cleanImageCache() {
+        ImageCache.default.clearMemoryCache()
+        ImageCache.default.clearDiskCache()
     }
     
     // MARK: - Requests

@@ -16,6 +16,6 @@ final class OAuth2TokenStorageStub: OAuth2TokenStorageProtocol {
     private init() {}
     
     func removeTokenKey() {
-        
+        token = nil
     }
 }

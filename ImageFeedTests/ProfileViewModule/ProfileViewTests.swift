@@ -56,38 +56,30 @@ final class ProfileViewTests: XCTestCase {
         XCTAssertEqual(presenter.profileImageURL, "Quuuux")
     }
     
-    func testViewControllerCallsPresenterDidTapLogoutButton() {
+    func testViewControllerCallsPresenterClearUserData() {
         //given
         let presenter = ProfileViewPresenterSpy(view: viewController, profileHelper: profileHelper)
         viewController.presenter = presenter
         
         //when
         viewController.loadViewIfNeeded()
-        presenter.didTapLogoutButton()
+        presenter.clearUserData()
 
         //then
-        XCTAssertTrue(presenter.isDidTapLogoutButtonCalled)
+        XCTAssertNil(tokenStorage.token)
     }
     
-    func testPresenterCallsViewControllerShowLogoutAlert() {
+    func testViewControllerCallsPresenterSwitchToSplashScreen() {
         //given
-        let view = ProfileViewControllerSpy()
-        view.presenter = presenter
-        
-        let model = AlertModel(
-            title: "Foo",
-            message: "Baz",
-            buttons: [.yesButton, .noButton],
-            identifier: "Bar",
-            completion: {}
-        )
+        let presenter = ProfileViewPresenterSpy(view: viewController, profileHelper: profileHelper)
+        viewController.presenter = presenter
         
         //when
-        view.loadViewIfNeeded()
-        view.showLogoutAlert(model: model)
+        viewController.loadViewIfNeeded()
+        presenter.switchToSplashScreen()
         
         //then
-        XCTAssertTrue(view.isShowLogoutAlertCalled)
+        XCTAssertTrue(presenter.isSwitchToSplashScreenCalled)
     }
     
     func testPresenterCallsViewControllerUpdateProfileDetail() {

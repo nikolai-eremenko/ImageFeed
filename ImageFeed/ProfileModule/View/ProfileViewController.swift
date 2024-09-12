@@ -10,8 +10,7 @@ import Kingfisher
 
 protocol ProfileViewControllerProtocol: AnyObject {
     var presenter: ProfileViewPresenterProtocol? { get set }
-    func showLogoutAlert(model: AlertModel)
-    func dismissView()
+    func showLogoutAlert()
     func updateProfileDetails(with model: Profile)
     func updateProfileImage(with stringURL: String?)
     func failureProfileDetails(error: Error)
@@ -119,7 +118,21 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     }
     
     // MARK: - Logout Alert
-    func showLogoutAlert(model: AlertModel) {
+    func showLogoutAlert() {
+        let model = AlertModel(
+            title: "Пока, пока!",
+            message: "Уверенные что хотите выйти?",
+            buttons: [.yesButton, .noButton],
+            identifier: "Logout",
+            completion: { [weak self] in
+                guard let self else { return }
+                
+                self.presenter?.clearUserData()
+                self.dismiss(animated: true)
+                self.presenter?.switchToSplashScreen()
+            }
+        )
+        
         AlertPresenter.showAlert(on: self, model: model)
     }
     
@@ -198,27 +211,18 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
               separator: "\n")
     }
     
-    // MARK: - Dismiss View
-    func dismissView() {
-        dismiss(animated: true)
-    }
-}
-
-private extension ProfileViewController {
     //MARK: - Animations
-    func addLoadingAnimation() {
+    private func addLoadingAnimation() {
         profilePhotoImageView.addLoadingLayer(radius: profilePhotoImageView.frame.width/2)
-        
         nameAnimationView.addLoadingLayer(radius: nameAnimationView.frame.height/2)
         nickAnimationView.addLoadingLayer(radius: nickAnimationView.frame.height/2)
         aboutAnimationView.addLoadingLayer(radius: aboutAnimationView.frame.height/2)
     }
     
-    func removeLoadingAnimation() {
+    private func removeLoadingAnimation() {
         nameAnimationView.removeLoadingLayer()
         nickAnimationView.removeLoadingLayer()
         aboutAnimationView.removeLoadingLayer()
-        
         nameAnimationView.removeFromSuperview()
         nickAnimationView.removeFromSuperview()
         aboutAnimationView.removeFromSuperview()
@@ -226,12 +230,12 @@ private extension ProfileViewController {
     
     //MARK: - Actions
     @objc
-    func logoutAction() {
-        presenter?.didTapLogoutButton()
+    private func logoutAction() {
+        showLogoutAlert()
     }
     
     // MARK: - Constraints
-    func setupViews() {
+    private func setupViews() {
         view.backgroundColor = .ypBlack
         view.addSubview(profileStackView)
         profileStackView.translatesAutoresizingMaskIntoConstraints = false
@@ -249,7 +253,7 @@ private extension ProfileViewController {
         setupConstraints()
     }
     
-    func setupConstraints() {
+    private func setupConstraints() {
         NSLayoutConstraint.activate([
             profileStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             profileStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),

@@ -18,7 +18,10 @@ final class ProfileViewControllerSpy: UIViewController, ProfileViewControllerPro
     var isFailureProfileImageCalled: Bool = false
     var profile = Profile(username: "", name: "", loginName: "", bio: nil)
     
-    func dismissView() {}
+    
+    func updateProfileDetails(with model: Profile) {
+        profile = model
+    }
     
     func updateProfileImage(with stringURL: String?) {
         imageStringURL = stringURL
@@ -32,12 +35,7 @@ final class ProfileViewControllerSpy: UIViewController, ProfileViewControllerPro
         isFailureProfileImageCalled = true
     }
     
-    func showLogoutAlert(model: AlertModel) {
+    func showLogoutAlert() {
         isShowLogoutAlertCalled = true
     }
-    
-    func updateProfileDetails(with model: Profile) {
-        profile = model
-    }
-    
 }

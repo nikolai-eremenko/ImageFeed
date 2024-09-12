@@ -9,7 +9,8 @@ import UIKit
 
 protocol ProfileViewPresenterProtocol {
     var view: ProfileViewControllerProtocol? { get set }
-    func didTapLogoutButton()
+    func clearUserData()
+    func switchToSplashScreen()
     func viewDidAppear()
 }
 
@@ -29,42 +30,20 @@ final class ProfileViewPresenter: ProfileViewPresenterProtocol {
         fetchProfile()
     }
     
-    func didTapLogoutButton() {
-        view?.showLogoutAlert(model: getLogoutAlert())
-    }
-    
-    // MARK: - Alert
-    private func getLogoutAlert() -> AlertModel {
-        let model = AlertModel(
-            title: "Пока, пока!",
-            message: "Уверенные что хотите выйти?",
-            buttons: [.yesButton, .noButton],
-            identifier: "Logout",
-            completion: { [weak self] in
-                guard
-                    let self,
-                    let view = self.view
-                else {
-                    return
-                }
-                self.profileHelper.clearUserData(vc: view)
-            }
-        )
-        return model
+    func clearUserData() {
+        profileHelper.clearUserData()
     }
     
     // MARK: - Navigation
-//    private func switchToSplashScreen() {
-//        if !profileHelper.isAuthorized() {
-//            guard let window = UIApplication.shared.windows.first else {
-//                assertionFailure("Invalid window configuration")
-//                return
-//            }
-//            window.rootViewController = SplashViewController()
-//            window.makeKeyAndVisible()
-//            UIView.transition(with: window, duration: 0.3, options: [.transitionCrossDissolve], animations: nil, completion: nil)
-//        }
-//    }
+    func switchToSplashScreen() {
+        guard let window = UIApplication.shared.windows.first else {
+            assertionFailure("Invalid window configuration")
+            return
+        }
+        window.rootViewController = SplashViewController()
+        window.makeKeyAndVisible()
+        UIView.transition(with: window, duration: 0.3, options: [.transitionCrossDissolve], animations: nil, completion: nil)
+    }
     
     // MARK: - Fetching
     private func fetchProfile() {

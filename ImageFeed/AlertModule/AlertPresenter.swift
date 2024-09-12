@@ -41,7 +41,9 @@ struct AlertPresenter {
                 alert.addAction(action)
             default:
                 let action = UIAlertAction(title: button.title, style: .default) { _ in
-                    completion()
+                    DispatchQueue.main.async {
+                        completion()
+                    }
                 }
                 action.accessibilityIdentifier = button.accessibilityIdentifier
                 alert.addAction(action)

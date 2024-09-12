@@ -12,11 +12,11 @@ final class ProfileViewPresenterSpy: ProfileViewPresenterProtocol {
     weak var view: ProfileViewControllerProtocol?
     private let profileHelper: ProfileHelperProtocol
     
-    var isViewDidAppearCalled: Bool = false
     var profile: Profile? = nil
     var profileImageURL: String? = nil
     
     var isDidTapLogoutButtonCalled: Bool = false
+    var isSwitchToSplashScreenCalled: Bool = false
     
     init(
         view: ProfileViewControllerProtocol,
@@ -28,16 +28,20 @@ final class ProfileViewPresenterSpy: ProfileViewPresenterProtocol {
     
     func viewDidAppear() {
         fetchProfile()
-        isViewDidAppearCalled = true
+    }
+    
+    func clearUserData() {
+        profileHelper.clearUserData()
+    }
+    
+    func switchToSplashScreen() {
+        isSwitchToSplashScreenCalled = true
     }
     
     func didTapLogoutButton() {
         isDidTapLogoutButtonCalled = true
     }
     
-    func addProfileImageServiceObserver() {
-        
-    }
     
     func getProfileDetails() {
         
@@ -46,31 +50,9 @@ final class ProfileViewPresenterSpy: ProfileViewPresenterProtocol {
     func getProfileImageURL() {
         
     }
-}
-
-private extension ProfileViewPresenterSpy {
-    // MARK: - Alert
-    func getLogoutAlert() -> AlertModel {
-        let model = AlertModel(
-            title: "Пока, пока!",
-            message: "Уверенные что хотите выйти?",
-            buttons: [.yesButton, .noButton],
-            identifier: "Logout",
-            completion: { [weak self] in
-                guard
-                    let self,
-                    let view = self.view
-                else {
-                    return
-                }
-                self.profileHelper.clearUserData(vc: view)
-            }
-        )
-        return model
-    }
     
     // MARK: - Fetching
-    func fetchProfile() {
+    private func fetchProfile() {
         profileHelper.fetchProfile { [weak self] result in
             guard let self else { return }
             
@@ -84,7 +66,7 @@ private extension ProfileViewPresenterSpy {
         }
     }
     
-    func fetchProfileImageURL(username: String) {
+    private func fetchProfileImageURL(username: String) {
         profileHelper.fetchProfileImageURL(username: username) { [weak self] result in
             guard let self else { return }
             
