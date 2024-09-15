@@ -55,6 +55,7 @@ final class ImageFeedUITests: XCTestCase {
     /// тестируем сценарий ленты
     func testFeed() throws {
         let tablesQuery = app.tables
+        
         let cell = tablesQuery.children(matching: .cell).element(boundBy: 0)
         XCTAssertTrue(cell.waitForExistence(timeout: 5))
         
@@ -62,14 +63,30 @@ final class ImageFeedUITests: XCTestCase {
         app.swipeDown()
         
         let cellToLike = tablesQuery.children(matching: .cell).element(boundBy: 0)
+        let likeButton = cellToLike.buttons.firstMatch
+        let spinner = app.activityIndicators.firstMatch
+        func checkSpinner() {
+            for _ in 1...5 {
+                if spinner.exists {
+                    sleep(1)
+                } else {
+                    break
+                }
+            }
+            if spinner.exists {
+                XCTFail("Spinner still exists")
+            }
+        }
         
-        cellToLike.buttons["likeButtonIsNotLiked"].tap()
-        sleep(5)
-        cellToLike.buttons["likeButtonIsLiked"].tap()
-        sleep(5)
+        likeButton.tap()
+        checkSpinner()
+        
+        likeButton.tap()
+        checkSpinner()
         
         cellToLike.tap()
-        
+        checkSpinner()
+
         let image = app.scrollViews.images.element(boundBy: 0)
         XCTAssertTrue(image.waitForExistence(timeout: 5))
         image.pinch(withScale: 3, velocity: 1)
