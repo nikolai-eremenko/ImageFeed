@@ -9,7 +9,6 @@ import UIKit
 import ProgressHUD
 
 final class UIBlockingProgressHUD {
-     
     static func show() {
         ProgressHUD.colorBackground = .ypBackground
         ProgressHUD.animationType = .activityIndicator

@@ -60,7 +60,7 @@ final class ImageFeedUITests: XCTestCase {
         XCTAssertTrue(cell.waitForExistence(timeout: 5))
         
         app.swipeUp()
-        app.swipeDown()
+        app.swipeDown(velocity: .fast)
         
         let cellToLike = tablesQuery.children(matching: .cell).element(boundBy: 0)
         let likeButton = cellToLike.buttons.firstMatch

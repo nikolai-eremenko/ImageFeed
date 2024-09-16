@@ -30,3 +30,20 @@ struct Photo {
         self.isLiked = isLiked
     }
 }
+
+struct PhotoResult: Codable {
+    let id: String
+    let createdAt: String
+    let width: Int
+    let height: Int
+    let likedByUser: Bool
+    let description: String?
+    let urls: UrlsResult
+}
+
+struct UrlsResult: Codable {
+    let full: String
+    let regular: String
+    let small: String
+    let thumb: String
+}
