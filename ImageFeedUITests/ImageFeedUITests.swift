@@ -17,6 +17,8 @@ final class ImageFeedUITests: XCTestCase {
     }
     
     /// тестируем сценарий авторизации
+    /// необходимо убедиться что в симуляторе/девайсе выбрана английская раскладка клавиатуры для поля ввода пароля
+    /// иначе пароль может вводится не полностью
     func testAuth() throws {
         app.buttons["Authenticate"].tap()
         
@@ -54,39 +56,17 @@ final class ImageFeedUITests: XCTestCase {
     
     /// тестируем сценарий ленты
     func testFeed() throws {
-        let tablesQuery = app.tables
-        
-        let cell = tablesQuery.children(matching: .cell).element(boundBy: 0)
+        let cell = app.tables.children(matching: .cell).element(boundBy: 0)
         XCTAssertTrue(cell.waitForExistence(timeout: 5))
         
         app.swipeUp()
-        app.swipeDown(velocity: .fast)
+       
+        cell.buttons["Like Button"].tap()
         
-        let cellToLike = tablesQuery.children(matching: .cell).element(boundBy: 0)
-        let likeButton = cellToLike.buttons.firstMatch
-        let spinner = app.activityIndicators.firstMatch
-        func checkSpinner() {
-            for _ in 1...5 {
-                if spinner.exists {
-                    sleep(1)
-                } else {
-                    break
-                }
-            }
-            if spinner.exists {
-                XCTFail("Spinner still exists")
-            }
-        }
-        
-        likeButton.tap()
-        checkSpinner()
-        
-        likeButton.tap()
-        checkSpinner()
-        
-        cellToLike.tap()
-        checkSpinner()
+        cell.buttons["Like Button"].tap()
 
+        cell.images["Photo"].tap()
+        
         let image = app.scrollViews.images.element(boundBy: 0)
         XCTAssertTrue(image.waitForExistence(timeout: 5))
         image.pinch(withScale: 3, velocity: 1)

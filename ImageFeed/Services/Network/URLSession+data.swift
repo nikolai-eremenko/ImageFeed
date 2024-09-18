@@ -19,6 +19,7 @@ enum NetworkError: Error {
     case forbidden
     case notFound
     case serverError
+    case rateLimit
 }
 
 extension URLSession {
@@ -30,7 +31,14 @@ extension URLSession {
         }
         
         let task = dataTask(with: request, completionHandler: { data, response, error in
-            if let data = data, let response = response, let statusCode = (response as? HTTPURLResponse)?.statusCode {
+            if let data = data, let response = response, let statusCode = (response as? HTTPURLResponse)?.statusCode, let headers = (response as? HTTPURLResponse)?.allHeaderFields {
+                
+                if let rateLimitRemaining = headers["X-Ratelimit-Remaining"] as? Int {
+                    if rateLimitRemaining == 0 {
+                        fulfillCompletionOnTheMainThread(.failure(NetworkError.rateLimit))
+                    }
+                }
+                
                 switch statusCode {
                 case 200...299:
                     fulfillCompletionOnTheMainThread(.success(data))

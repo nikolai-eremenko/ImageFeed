@@ -21,6 +21,8 @@ final class ImagesListCell: UITableViewCell {
         let view = UIView()
         view.layer.masksToBounds = true
         view.layer.cornerRadius = 16
+        view.isAccessibilityElement = true
+        view.accessibilityIdentifier = "Photo Cell"
         
         return view
     }()
@@ -30,6 +32,8 @@ final class ImagesListCell: UITableViewCell {
         view.image = UIImage(named: "ic.scribble.variable")
         view.contentMode = .scaleAspectFill
         view.backgroundColor = .clear
+        view.isAccessibilityElement = true
+        view.accessibilityIdentifier = "Photo"
         
         return view
     }()
@@ -39,6 +43,7 @@ final class ImagesListCell: UITableViewCell {
         view.startColor = .ypBlack
         view.endColor = .clear
         view.angle = 90
+        view.isAccessibilityElement = false
         
         return view
     }()
@@ -47,8 +52,9 @@ final class ImagesListCell: UITableViewCell {
         let view = UIButton(type: .custom)
         view.setImage(UIImage(named: "ic.like"), for: .normal)
         view.tintColor = .ypWhiteAlpha50
-        view.accessibilityIdentifier = "likeButtonIsNotLiked"
+        view.accessibilityIdentifier = "Like Button"
         view.addTarget(self, action: #selector(likeButtonClicked), for: .touchUpInside)
+        view.isAccessibilityElement = true
         
         return view
     }()
@@ -58,6 +64,8 @@ final class ImagesListCell: UITableViewCell {
         view.text = "12/0/2"
         view.font = .systemFont(ofSize: 13, weight: .regular)
         view.textColor = .ypWhite
+        view.accessibilityIdentifier = "Date Label"
+        view.isAccessibilityElement = true
 
         return view
     }()
@@ -102,7 +110,6 @@ final class ImagesListCell: UITableViewCell {
         cellImageView.image = nil
         likeButton.tintColor = .ypWhiteAlpha50
         dateLabel.text = nil
-        likeButton.accessibilityIdentifier = "likeButtonIsNotLiked"
         removeLoadingAnimation()
     }
     
@@ -153,12 +160,10 @@ final class ImagesListCell: UITableViewCell {
         
         dateLabel.text = stringDate
         likeButton.tintColor = model.isLiked ? .ypRed : .ypWhiteAlpha50
-        likeButton.accessibilityIdentifier = model.isLiked ? "likeButtonIsLiked" : "likeButtonIsNotLiked"
     }
     
     func setIsLiked(_ isLiked: Bool) {
         likeButton.tintColor = isLiked ? .ypRed : .ypWhiteAlpha50
-        likeButton.accessibilityIdentifier = isLiked ? "likeButtonIsLiked" : "likeButtonIsNotLiked"
     }
     
     // MARK: - Animations
