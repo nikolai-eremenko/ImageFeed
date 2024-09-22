@@ -8,13 +8,12 @@
 import Foundation
 
 enum Endpoint {
-    
-    case authorize(url: String = "/oauth/authorize")
-    case sendCode(url: String = "/oauth/token", code: String)
-    case getProfile(url: String = "/me", token: String)
-    case getProfileImage(url: String = "/users", token: String, username: String)
-    case getImages(url: String = "/photos", token: String, page: Int, perPage: Int)
-    case changeLike(url: String = "/photos/", photoId: String, isLike: Bool, token: String)
+    case authorize(config: Configuration)
+    case sendCode(config: Configuration, code: String)
+    case getProfile(config: Configuration, token: String)
+    case getProfileImage(config: Configuration, token: String, username: String)
+    case getImages(config: Configuration, token: String, page: Int, perPage: Int)
+    case changeLike(config: Configuration, photoId: String, isLike: Bool, token: String)
     
     var request: URLRequest? {
         guard let url = self.url else {
@@ -28,39 +27,66 @@ enum Endpoint {
         return request
     }
     
-    private var url: URL? {
-        var components = URLComponents()
-        components.scheme = Constants.API.scheme
-        components.host = self.host
-        components.port = Constants.API.port
-        components.path = self.path
-        components.queryItems = self.queryItems
-        return components.url
-    }
-    
-    private var host: String {
+    private var configuration: Configuration {
         switch self {
-        case .authorize, .sendCode:
-            return Constants.API.oauthBaseURL
-        case .getProfile, .getProfileImage, .getImages, .changeLike:
-            return Constants.API.baseURL
+        case .authorize(let config):
+            return config
+        case .sendCode(let config, _):
+            return config
+        case .getProfile(let config, _):
+            return config
+        case .getProfileImage(let config, _, _):
+            return config
+        case .getImages(let config, _, _, _):
+            return config
+        case .changeLike(let config, _, _, _):
+            return config
         }
     }
     
-    private var path: String {
+    private var url: URL? {
         switch self {
-        case .authorize(let url):
-            return url
-        case .sendCode(let url, _):
-            return url
-        case .getProfile(let url, _):
-            return url
-        case .getProfileImage(let url, _, let username):
-            return url + "/" + username
-        case .getImages(let url, _, _, _):
-            return url
-        case .changeLike(let url, let photoId, _, _):
-            return url + photoId + "/like"
+        case .authorize, .sendCode:
+            guard var components = URLComponents(string: configuration.authURL.absoluteString) else {
+                assertionFailure("failed to create URLComponents")
+                return nil
+            }
+            
+            if let path = self.path {
+                components.path = path
+            }
+            
+            components.queryItems = self.queryItems
+            return components.url
+        case .getProfile, .getProfileImage, .getImages, .changeLike:
+            guard var components = URLComponents(string: configuration.apiURL.absoluteString) else {
+                assertionFailure("failed to create URLComponents")
+                return nil
+            }
+            
+            if let path = self.path {
+                components.path = path
+            }
+            
+            components.queryItems = self.queryItems
+            return components.url
+        }
+    }
+    
+    private var path: String? {
+        switch self {
+        case .authorize:
+            return configuration.authorizePath
+        case .sendCode:
+            return configuration.tokenPath
+        case .getProfile:
+            return configuration.profilePath
+        case .getProfileImage(_, _, let username):
+            return (configuration.profileImagePath ?? "") + username
+        case .getImages:
+            return configuration.photosPath
+        case .changeLike(_, let photoId, _, _):
+            return (configuration.photosPath ?? "") + "/" + photoId + "/like"
         }
     }
     
@@ -68,16 +94,16 @@ enum Endpoint {
         switch self {
         case .authorize:
             return [
-                URLQueryItem(name: "client_id", value: Constants.API.accessKey),
-                URLQueryItem(name: "redirect_uri", value: Constants.API.redirectURI),
+                URLQueryItem(name: "client_id", value: configuration.accessKey),
+                URLQueryItem(name: "redirect_uri", value: configuration.redirectURI),
                 URLQueryItem(name: "response_type", value: "code"),
-                URLQueryItem(name: "scope", value: Constants.API.accessScope)
+                URLQueryItem(name: "scope", value: configuration.accessScope)
             ]
         case .sendCode(_, let code):
             return [
-                URLQueryItem(name: "client_id", value: Constants.API.accessKey),
-                URLQueryItem(name: "client_secret", value: Constants.API.secretKey),
-                URLQueryItem(name: "redirect_uri", value: Constants.API.redirectURI),
+                URLQueryItem(name: "client_id", value: configuration.accessKey),
+                URLQueryItem(name: "client_secret", value: configuration.secretKey),
+                URLQueryItem(name: "redirect_uri", value: configuration.redirectURI),
                 URLQueryItem(name: "code", value: code),
                 URLQueryItem(name: "grant_type", value: "authorization_code")
             ]

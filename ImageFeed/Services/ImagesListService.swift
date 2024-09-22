@@ -7,35 +7,35 @@
 
 import Foundation
 
-final class ImagesListService {
+protocol ImagesListServiceProtocol {
+    var photos: [Photo] { get }
+    func fetchPhotosNextPage(request: URLRequest?, _ completion: @escaping (Result<Void, Error>) -> Void)
+    func changeLike(request: URLRequest?, photoId: String, _ completion: @escaping (Result<Void, Error>) -> Void)
+}
+
+final class ImagesListService: ImagesListServiceProtocol {
     // MARK: - properties
+    static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
+    private let dateFormatter = DateConvertor.shared
     private let urlSession = URLSession.shared
     private var fetchPhotosTask: URLSessionTask?
     private var changeLikeTask: URLSessionTask?
-    private(set) var photos = [Photo]()
-    private var lastLoadedPage: Int = 0
-    private let perPage: Int = 10
-    private let tokenStorage = OAuth2TokenStorage.shared
     
-    static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
-
+    private(set) var photos = [Photo]()
     
     // MARK: - Fetch photos
-    func fetchPhotosNextPage() {
+    func fetchPhotosNextPage(request: URLRequest?, _ completion: @escaping (Result<Void, Error>) -> Void) {
         assert(Thread.isMainThread)
         
-        guard
-            let token = tokenStorage.token,
-            fetchPhotosTask == nil
-        else {
+        guard fetchPhotosTask == nil else {
+            print("DEBUG",
+                  "[\(String(describing: self)).\(#function)]:",
+                  "Fetch task is already in progress",
+                  separator: "\n")
             return
         }
         
-        let nextPage = lastLoadedPage + 1
-        
-        guard
-            let request = Endpoint.getImages(token: token, page: nextPage, perPage: perPage).request
-        else {
+        guard let request else {
             print("cannot create URL")
             return
         }
@@ -45,31 +45,39 @@ final class ImagesListService {
             
             switch result {
             case .success(let object):
-                let photos = object.map { Photo(photoResult: $0) }
+                let photos = object.map {
+                    Photo(id: $0.id,
+                          size: CGSize(width: $0.width, height: $0.height),
+                          createdAt: self.dateFormatter.getDateFromString(from: $0.createdAt),
+                          welcomeDescription: $0.description,
+                          fullImageURL: $0.urls.full,
+                          largeImageURL: $0.urls.regular,
+                          smallImageURL: $0.urls.small,
+                          thumbImageURL: $0.urls.thumb,
+                          isLiked: $0.likedByUser)
+                }
                 
                 DispatchQueue.main.async {
                     self.photos.append(contentsOf: photos)
-                    self.lastLoadedPage = nextPage
                     NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
-                    self.fetchPhotosTask = nil
                 }
+                completion(.success(Void()))
             case .failure(let error):
                 print("DEBUG",
                       "[\(String(describing: self)).\(#function)]:",
                       "Error while fetching images:",
                       error.localizedDescription,
                       separator: "\n")
-                DispatchQueue.main.async {
-                    self.fetchPhotosTask = nil
-                }
+                completion(.failure(error))
             }
+            self.fetchPhotosTask = nil
         }
         self.fetchPhotosTask = task
         task.resume()
     }
     
     // MARK: - Change like
-    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
+    func changeLike(request: URLRequest?, photoId: String, _ completion: @escaping (Result<Void, Error>) -> Void) {
         assert(Thread.isMainThread)
         
         if changeLikeTask != nil {
@@ -80,12 +88,8 @@ final class ImagesListService {
             changeLikeTask?.cancel()
         }
         
-        guard let token = tokenStorage.token else { return }
-        
-        guard
-            let request = Endpoint.changeLike(photoId: photoId, isLike: isLike, token: token).request
-        else {
-            completion(.failure(NetworkError.invalidRequest))
+        guard let request else {
+            print("cannot create URL")
             return
         }
         
@@ -106,9 +110,18 @@ final class ImagesListService {
             
             if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
                 let photo = self.photos[index]
-                let newPhoto = Photo(photo: photo, isLiked: !photo.isLiked)
+                let newPhoto = Photo(id: photo.id,
+                                     size: photo.size,
+                                     createdAt: photo.createdAt,
+                                     welcomeDescription: photo.welcomeDescription,
+                                     fullImageURL: photo.fullImageURL,
+                                     largeImageURL: photo.largeImageURL,
+                                     smallImageURL: photo.smallImageURL,
+                                     thumbImageURL: photo.thumbImageURL,
+                                     isLiked: !photo.isLiked)
                 DispatchQueue.main.async {
                     self.photos = self.photos.withReplaced(itemAt: index, newValue: newPhoto)
+                    NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
                 }
                 
                 completion(.success(Void()))
@@ -117,9 +130,5 @@ final class ImagesListService {
         }
         changeLikeTask = task
         task.resume()
-    }
-    
-    func cleanImagesList() {
-        photos.removeAll()
     }
 }

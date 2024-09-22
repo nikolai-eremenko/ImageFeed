@@ -55,7 +55,7 @@ final class OAuth2Service {
         lastCode = code
         
         guard
-            let request = Endpoint.sendCode(code: code).request
+            let request = Endpoint.sendCode(config: .standard, code: code).request
         else {
             completion(.failure(NetworkError.invalidRequest))
             fatalError("cannot create URL")

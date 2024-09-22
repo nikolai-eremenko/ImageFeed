@@ -7,25 +7,23 @@
 
 import Foundation
 
-final class ProfileService {
+protocol ProfileServiceProtocol {
+    var profile: Profile? { get set}
+    func fetchProfile(request: URLRequest?, completion: @escaping (Result<Profile, Error>) -> Void)
+}
+
+final class ProfileService: ProfileServiceProtocol {
     // MARK: - properties
-    static let shared = ProfileService()
-    
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
-    private(set) var profile: Profile?
+    var profile: Profile?
     
-    // MARK: - Init
-    private init() { }
-    
-    // MARK: - Public methods
-    func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
+    // MARK: - Fetch profile
+    func fetchProfile(request: URLRequest?, completion: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread)
         task?.cancel()
         
-        guard
-            let request = Endpoint.getProfile(token: token).request
-        else {
+        guard let request else {
             completion(.failure(NetworkError.invalidRequest))
             fatalError("cannot create URL")
         }
@@ -38,10 +36,9 @@ final class ProfileService {
             switch result {
             case .success(let object):
                 let profile = Profile(from: object)
-                self.profile = profile
                 completion(.success(profile))
                 DispatchQueue.main.async {
-                    self.task = nil
+                    self.profile = profile
                 }
             case .failure(let error):
                 print("DEBUG",
@@ -50,16 +47,10 @@ final class ProfileService {
                       error.localizedDescription,
                       separator: "\n")
                 completion(.failure(error))
-                DispatchQueue.main.async {
-                    self.task = nil
-                }
             }
+            self.task = nil
         }
         self.task = task
         task.resume()
-    }
-    
-    func cleanProfile() {
-        profile = nil
     }
 }
